@@ -46,15 +46,14 @@ public class UserController {
     /**
      * @Description: Register user
      * @param user - the actual user being registered
-     * @param request - used to find the current user
+     * @param  - used to find the current user
      * @return StringSuccessJSON
      */
-    @Secured({"ROLE_super_admin"})
+//    @Secured({"ROLE_super_admin"})
     @RequestMapping(value = "/addUser", method = RequestMethod.POST)
     @ApiResponse(description = "Registers an user")
-    public ResponseEntity<?> addUser(@RequestBody UserDTO user,
-                                     HttpServletRequest request) {
-        String response = userService.addUser(request, user);
+    public ResponseEntity<?> addUser(@RequestBody UserDTO user) {
+        String response = userService.addUser( user);
         if (response.equals("emailExists") || response.equals("emailNotValid") || response.equals("notAllowed")) {
             return new ResponseEntity<>(new StringSuccessJSON(false, response), HttpStatus.BAD_REQUEST);
         } else

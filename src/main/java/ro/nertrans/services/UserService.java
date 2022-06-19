@@ -64,14 +64,14 @@ public class UserService implements UserDetailsService {
     }
 
 
-    public String addUser(HttpServletRequest request, UserDTO user){
-        if (getCurrentUser(request).isEmpty()){
-            return "youAreNotLoggedIn";
-        }
-        Optional<User> currentUser = getCurrentUser(request);
-        if (!currentUser.get().getRoles().contains(UserRoleEnum.ROLE_super_admin)){
-            return "notAllowed";
-        }
+    public String addUser( UserDTO user){
+//        if (getCurrentUser(request).isEmpty()){
+//            return "youAreNotLoggedIn";
+//        }
+//        Optional<User> currentUser = getCurrentUser(request);
+//        if (!currentUser.get().getRoles().contains(UserRoleEnum.ROLE_super_admin)){
+//            return "notAllowed";
+//        }
         if (userRepository.getByEmail(user.getEmail()).isPresent()) {
             return "emailExists";
         }
