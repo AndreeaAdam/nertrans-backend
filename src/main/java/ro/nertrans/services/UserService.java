@@ -39,14 +39,13 @@ public class UserService implements UserDetailsService {
     private MailService mailService;
     @Value("${apiUrl}")
     private String apiUrl;
+    @Value("${apiUrlPort}")
+    private String apiUrlPort;
 
 
     @EventListener(ApplicationReadyEvent.class)
     private void createSuperAdmin() {
-        boolean adminExists = false;
-        if (userRepository.existsById("1")) {
-            adminExists = true;
-        }
+        boolean adminExists = userRepository.existsById("1");
         if (!adminExists) {
             User user = new User();
             user.setId("1");
@@ -102,7 +101,7 @@ public class UserService implements UserDetailsService {
         try {
             String registrationCode = randomCodeService.generateRandomCode();
             String url = "<p style=\"margin:0 0 16px\">Pentru a finaliza înregistrarea unui cont nou, trebuie să dați click pe link-ul de mai jos.</p>" +
-                    apiUrl + "/arcos/activateUser?registrationCode=" + registrationCode;
+                    apiUrlPort + "/nertrans/activateUser?registrationCode=" + registrationCode;
             createCode(user.get().getEmail(), user.get().getId(), registrationCode);
             mailService.sendMailSMTPGeneric(user.get().getEmail(), "Confirmare adresă de email NERTRANS", url);
         } catch (Exception e) {

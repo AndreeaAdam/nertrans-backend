@@ -5,8 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ro.nertrans.filters.filteredDTOS.PartnerSearchDTO;
+import ro.nertrans.filters.filteredDTOS.PaymentDocumentSearchDTO;
 import ro.nertrans.filters.filteredDTOS.UserSearchDTO;
 import ro.nertrans.filters.filteredServices.PartnerSearchService;
+import ro.nertrans.filters.filteredServices.PaymentDocSearchService;
 import ro.nertrans.filters.filteredServices.UserSearchService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +20,8 @@ public class SearchController {
     private UserSearchService userSearchService;
     @Autowired
     private PartnerSearchService partnerSearchService;
+    @Autowired
+    private PaymentDocSearchService paymentDocSearchService;
 
     /**
      * @param user UserFilterDTO
@@ -42,12 +46,23 @@ public class SearchController {
     @RequestMapping(value = "/listPartnerFiltered", method = RequestMethod.POST)
     @ApiResponse(description = "Filtered and paginated list of partners")
     public ResponseEntity<?> listPartnerFiltered(@RequestBody PartnerSearchDTO partnerSearchDTO,
-                                               @RequestParam(value = "page") int page,
-                                               @RequestParam(value = "size") int size,
-                                               @RequestParam(value = "sort", required = false) String sort,
-                                               @RequestParam(value = "dir", required = false) String dir,
-                                               HttpServletRequest request) {
+                                                 @RequestParam(value = "page") int page,
+                                                 @RequestParam(value = "size") int size,
+                                                 @RequestParam(value = "sort", required = false) String sort,
+                                                 @RequestParam(value = "dir", required = false) String dir,
+                                                 HttpServletRequest request) {
         return ResponseEntity.ok(partnerSearchService.listPartnerFiltered(partnerSearchDTO, page, size, sort, dir, request));
+    }
+
+    @RequestMapping(value = "/listPaymentDocsFiltered", method = RequestMethod.POST)
+    @ApiResponse(description = "Filtered and paginated list of payment documents")
+    public ResponseEntity<?> listPaymentDocsFiltered(@RequestBody PaymentDocumentSearchDTO PaymentDocumentSearchDTO,
+                                                     @RequestParam(value = "page") int page,
+                                                     @RequestParam(value = "size") int size,
+                                                     @RequestParam(value = "sort", required = false) String sort,
+                                                     @RequestParam(value = "dir", required = false) String dir,
+                                                     HttpServletRequest request) {
+        return ResponseEntity.ok(paymentDocSearchService.listPaymentDocsFiltered(PaymentDocumentSearchDTO, page, size, sort, dir, request));
     }
 
 }

@@ -9,7 +9,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -17,7 +16,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Configuration
 @EnableAutoConfiguration
 @SpringBootApplication
-//@ComponentScan(basePackages = {"com.nertrans"})
 public class NertransApplication extends SpringBootServletInitializer {
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
@@ -33,6 +31,6 @@ public class NertransApplication extends SpringBootServletInitializer {
         return new OpenAPI()
                 .components(new Components())
                 .info(new Info().title("Contact Application API NERTRANS").description(
-                        "This is a sample Spring Boot RESTful service using springdoc-openapi and OpenAPI 3."));
+                        "This is a sample Spring Boot RESTFul service using springDoc-openapi and OpenAPI 3."));
     }
 }

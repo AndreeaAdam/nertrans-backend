@@ -63,4 +63,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic()
                 .authenticationEntryPoint(new NoPopupBasicAuthenticationEntryPoint());
     }
+
 }

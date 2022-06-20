@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import ro.nertrans.dtos.OfficeNumberDTO;
+
+import java.util.ArrayList;
 
 @Data
 @NoArgsConstructor
@@ -21,4 +24,10 @@ public class Setting {
 
     @Field("smartBillToken")
     private String smartBillToken;
+
+    @Field("userOffices")
+    private ArrayList<String> userOffices;
+
+    @Field("officeNumber")
+    private ArrayList<OfficeNumberDTO> officeNumber;
 }
