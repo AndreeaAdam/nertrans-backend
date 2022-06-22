@@ -8,9 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserSearchDTO {
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String employeeCode;
     private String office;
+    private String active;
+    private String name;
 }

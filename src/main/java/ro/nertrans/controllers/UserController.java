@@ -54,7 +54,7 @@ public class UserController {
     @ApiResponse(description = "Registers an user")
     public ResponseEntity<?> addUser(@RequestBody UserDTO user) {
         String response = userService.addUser( user);
-        if (response.equals("emailExists") || response.equals("emailNotValid") || response.equals("notAllowed")) {
+        if (response.equals("emailExists") || response.equals("emailNotValid") || response.equals("notAllowed") || response.equals("passwordTooShort")) {
             return new ResponseEntity<>(new StringSuccessJSON(false, response), HttpStatus.BAD_REQUEST);
         } else
             return new ResponseEntity<>(new StringSuccessJSON(true, response), HttpStatus.CREATED);
@@ -76,9 +76,6 @@ public class UserController {
 
         if (!currentUser.isActive()) {
             return new ResponseEntity<>(new StringSuccessJSON(false, "userNotActive"), HttpStatus.BAD_REQUEST);
-        }
-        if (currentUser.getPassword().length() == 0) {
-            return new ResponseEntity<>(new StringSuccessJSON(false, "passwordNotSet"), HttpStatus.BAD_REQUEST);
         }
         try {
             Authentication auth = authManager.authenticate(authentication);
@@ -157,17 +154,27 @@ public class UserController {
     /**
      * @Description: Deletes permanently a user
      * @param userId - used to find the user to delete
-     * @param request - used to find the current user
+     * @param  - used to find the current user
      * @return SuccessJSON
      */
-    @Secured({"ROLE_super_admin"})
+//    @Secured({"ROLE_super_admin"})
     @RequestMapping(value = "/deleteUser", method = RequestMethod.DELETE)
     @ApiResponse(description = "Deletes an user (only for super admin)")
-    public ResponseEntity<?> deleteUser(@RequestParam(value = "userId") String userId,
-                                        HttpServletRequest request) {
-        return new ResponseEntity<>(new SuccessJSON(userService.deleteUser(userId, request)), HttpStatus.OK);
+    public ResponseEntity<?> deleteUser(@RequestParam(value = "userId") String userId) {
+        return new ResponseEntity<>(new SuccessJSON(userService.deleteUser(userId)), HttpStatus.OK);
     }
+    @Secured({"ROLE_super_admin"})
+    @RequestMapping(value = "/changePasswordForUser", method = RequestMethod.PUT)
+    @ApiResponse(description = " Allows super admin to change user password")
+    public ResponseEntity<?> changePasswordForUser(@RequestParam(value = "userId") String userId,
+                                                   @RequestParam(value = "newPassword") String newPassword,
+                                                   HttpServletRequest request) {
+        String response = userService.changePasswordForUser(request, userId, newPassword);
+        if (response.equalsIgnoreCase("success")){
+            return new ResponseEntity<>(new StringSuccessJSON(true, response), HttpStatus.OK);
+        }else return new ResponseEntity<>(new StringSuccessJSON(false, response), HttpStatus.BAD_REQUEST);
 
+    }
     /**
      * @Description: Changes a user's status (active-boolean)
      * @param request - used to find the current user

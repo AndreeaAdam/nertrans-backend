@@ -16,13 +16,12 @@ import ro.nertrans.models.User;
 import ro.nertrans.repositories.UserRepository;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Service
 public class UserSearchService {
     @Inject
-    MongoTemplate mongoTemplate;
+    private MongoTemplate mongoTemplate;
     @Autowired
     private UserRepository userRepository;
 
@@ -35,7 +34,7 @@ public class UserSearchService {
      * @return Page<User>
      * @Description: Filtered and paginated list of users
      */
-    public Page<User> listUsersFiltered(UserSearchDTO user, int page, int size, String sort, String dir, HttpServletRequest request) {
+    public Page<User> listUsersFiltered(UserSearchDTO user, int page, int size, String sort, String dir) {
         Pageable pageable;
         if (size == -1 && userRepository.findAll().size() > 0) {
             pageable = PageRequest.of(page, userRepository.findAll().size());
@@ -55,21 +54,14 @@ public class UserSearchService {
         } else {
             dynamicQuery = new Query().with(pageable);
         }
-        if (user.getFirstName() != null) {
-            Criteria userFirstNameCriteria = Criteria.where("firstName").regex(user.getFirstName(), "i");
+        if (user.getName() != null) {
+            Criteria userFirstNameCriteria = Criteria.where("name").regex(user.getName(), "i");
             dynamicQuery.addCriteria(userFirstNameCriteria);
         }
-        if (user.getLastName() != null) {
-            Criteria userLastNameCriteria = Criteria.where("lastName").regex(user.getLastName(), "i");
-            dynamicQuery.addCriteria(userLastNameCriteria);
-        }
-        if (user.getEmail() != null) {
-            Criteria userEmailCriteria = Criteria.where("email").in(user.getEmail(), "i");
+        if (user.getActive() != null) {
+            boolean active = user.getActive().equalsIgnoreCase("active");
+            Criteria userEmailCriteria = Criteria.where("active").is(active);
             dynamicQuery.addCriteria(userEmailCriteria);
-        }
-        if (user.getEmployeeCode() != null) {
-            Criteria userEmployeeCodeCriteria = Criteria.where("employeeCode").is(user.getEmployeeCode());
-            dynamicQuery.addCriteria(userEmployeeCodeCriteria);
         }
         if (user.getOffice() != null) {
             Criteria userOfficeCriteria = Criteria.where("office").is(user.getOffice());

@@ -54,4 +54,7 @@ public class User {
 
     @Field("registrationDate")
     private LocalDateTime registrationDate;
+
+    @Field("name")
+    private String name;
 }

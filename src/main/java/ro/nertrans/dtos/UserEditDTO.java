@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 public class UserEditDTO {
     private String firstName;
     private String lastName;
-    private String password;
     private String telephone;
     private String address;
     private String employeeCode;

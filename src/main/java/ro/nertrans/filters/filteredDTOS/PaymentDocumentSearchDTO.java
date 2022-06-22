@@ -15,5 +15,4 @@ public class PaymentDocumentSearchDTO {
     private String partnerId;
     private String status;
     private String docSeries;
-
 }

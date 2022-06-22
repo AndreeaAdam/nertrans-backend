@@ -11,13 +11,17 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
+import ro.nertrans.config.UserRoleEnum;
 import ro.nertrans.filters.filteredDTOS.PaymentDocumentSearchDTO;
 import ro.nertrans.models.PaymentDocument;
+import ro.nertrans.models.User;
 import ro.nertrans.repositories.PaymentDocumentRepository;
+import ro.nertrans.services.UserService;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PaymentDocSearchService {
@@ -25,6 +29,8 @@ public class PaymentDocSearchService {
     private MongoTemplate mongoTemplate;
     @Autowired
     private PaymentDocumentRepository paymentDocumentRepository;
+    @Autowired
+    private UserService userService;
 
     public Page<PaymentDocument> listPaymentDocsFiltered(PaymentDocumentSearchDTO paymentDocumentSearchDTO, int page, int size, String sort, String dir, HttpServletRequest request) {
         Pageable pageable;
@@ -45,6 +51,17 @@ public class PaymentDocSearchService {
             }
         } else {
             dynamicQuery = new Query().with(pageable);
+        }
+        Optional<User> user = userService.getCurrentUser(request);
+        Criteria docSeriesCriteria;
+        if (!user.get().getRoles().contains(UserRoleEnum.ROLE_super_admin)) {
+            docSeriesCriteria = Criteria.where("docSeries").is(user.get().getOffice().split(" "));
+            dynamicQuery.addCriteria(docSeriesCriteria);
+        } else {
+            if (paymentDocumentSearchDTO.getDocSeries() != null) {
+                docSeriesCriteria = Criteria.where("docSeries").is(paymentDocumentSearchDTO.getDocSeries());
+                dynamicQuery.addCriteria(docSeriesCriteria);
+            }
         }
         if (paymentDocumentSearchDTO.getName() != null) {
             Criteria paymentDocNameCriteria = Criteria.where("name").regex(paymentDocumentSearchDTO.getName(), "i");
@@ -69,10 +86,6 @@ public class PaymentDocSearchService {
         if (paymentDocumentSearchDTO.getStatus() != null) {
             Criteria statusCriteria = Criteria.where("status").is(paymentDocumentSearchDTO.getStatus());
             dynamicQuery.addCriteria(statusCriteria);
-        }
-        if (paymentDocumentSearchDTO.getDocSeries() != null) {
-            Criteria docSeriesCriteria = Criteria.where("docSeries").is(paymentDocumentSearchDTO.getDocSeries());
-            dynamicQuery.addCriteria(docSeriesCriteria);
         }
         dynamicQuery.collation(Collation.of("en").
                 strength(Collation.ComparisonLevel.secondary()));

@@ -38,9 +38,8 @@ public class SearchController {
                                                @RequestParam(value = "page") int page,
                                                @RequestParam(value = "size") int size,
                                                @RequestParam(value = "sort", required = false) String sort,
-                                               @RequestParam(value = "dir", required = false) String dir,
-                                               HttpServletRequest request) {
-        return ResponseEntity.ok(userSearchService.listUsersFiltered(user, page, size, sort, dir, request));
+                                               @RequestParam(value = "dir", required = false) String dir) {
+        return ResponseEntity.ok(userSearchService.listUsersFiltered(user, page, size, sort, dir));
     }
 
     @RequestMapping(value = "/listPartnerFiltered", method = RequestMethod.POST)

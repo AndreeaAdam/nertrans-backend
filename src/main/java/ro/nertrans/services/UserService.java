@@ -62,7 +62,7 @@ public class UserService implements UserDetailsService {
         }
     }
 
-
+  //todo: uncomment this + add description
     public String addUser( UserDTO user){
 //        if (getCurrentUser(request).isEmpty()){
 //            return "youAreNotLoggedIn";
@@ -85,9 +85,13 @@ public class UserService implements UserDetailsService {
         user1.setEmployeeCode(user.getEmployeeCode());
         user1.setOffice(user.getOffice());
         user1.setRegistrationDate(LocalDateTime.now());
+        user1.setName(user.getFirstName() + " " + user.getLastName());
         ArrayList<UserRoleEnum> userAuthorities = new ArrayList<>();
         userAuthorities.add(UserRoleEnum.ROLE_employee);
         user1.setRoles(userAuthorities);
+        if (user.getPassword().length() < 5){
+            return "passwordTooShort";
+        }
         user1.setPassword(securityConfig.passwordEncoder().encode(user.getPassword()));
         userRepository.save(user1);
         return user1.getId();
@@ -195,22 +199,38 @@ public class UserService implements UserDetailsService {
         targetUser.get().setEmployeeCode(user.getEmployeeCode());
         targetUser.get().setLastName(user.getLastName());
         targetUser.get().setFirstName(user.getFirstName());
-        targetUser.get().setPassword(securityConfig.passwordEncoder().encode(user.getPassword()));
+        targetUser.get().setName(user.getFirstName() + " " + user.getLastName());
         userRepository.save(targetUser.get());
         return "success";
+    }
+    /**
+     * @Description: Allows super admin to change user password
+     * @param request - used to find the current user
+     * @param userId - used to find the target user
+     * @param newPassword - the new password
+     * @return boolean
+     */
+    public String changePasswordForUser(HttpServletRequest request, String userId, String newPassword) {
+        Optional<User> user = userRepository.findById(userId);
+        Optional<User> currentUser = getCurrentUser(request);
+        if (currentUser.get().getRoles().contains(UserRoleEnum.ROLE_super_admin)) {
+            user.get().setPassword(securityConfig.passwordEncoder().encode(newPassword));
+            userRepository.save(user.get());
+            return "success";
+        } else return "notAllowed";
     }
 
     /**
      * @Description: Deletes permanently a user
      * @param userId - used to find the user to delete
-     * @param request - used to find the current user
+     * @param  - used to find the current user
      * @return boolean
      */
-    public boolean deleteUser(String userId, HttpServletRequest request) {
-        if (getCurrentUser(request).get().getRoles().contains(UserRoleEnum.ROLE_super_admin) && userRepository.existsById(userId)) {
+    public boolean deleteUser(String userId) {
+//        if (getCurrentUser(request).get().getRoles().contains(UserRoleEnum.ROLE_super_admin) && userRepository.existsById(userId)) {
             userRepository.deleteById(userId);
             return true;
-        } else return false;
+//        } else return false;
     }
 
 
