@@ -38,7 +38,7 @@ public class PaymentDocumentService {
         if (userService.getCurrentUser(request).isEmpty()) {
             return "youAreNotLoggedIn";
         }
-        if (settingService.getSettings().get().getUserOffices() != null && !settingService.getSettings().get().getUserOffices().contains(paymentDocument.getDocSeries())){
+        if (settingService.getSettings().get().getUserOffices() != null && settingService.getSettings().get().getUserOffices().stream().filter(officeDTO -> officeDTO.getCode().equalsIgnoreCase(paymentDocument.getDocSeries())).findFirst().isEmpty()){
             return "invalidDocSeries";
         }
         paymentDocument.setId(null);
@@ -50,6 +50,13 @@ public class PaymentDocumentService {
         return paymentDocument.getId();
     }
 
+    /**
+     * @Description: Updates a paymentDocument
+     * @param paymentDocId - used to find the doc
+     * @param paymentDocument - the new document
+     * @param request - used to find the current user
+     * @return String
+     */
     public String updatePaymentDocument(String paymentDocId, PaymentDocument paymentDocument, HttpServletRequest request) {
         if (userService.getCurrentUser(request).isEmpty()) {
             return "youAreNotLoggedIn";
@@ -88,7 +95,7 @@ public class PaymentDocumentService {
      */
     public Long getMaxNumberByOffice(String office) {
         Optional<OfficeNumberDTO> dto = settingService.getSettings().get().getOfficeNumber().stream().filter(officeNumberDTO -> officeNumberDTO.getOffice().equalsIgnoreCase(office)).findFirst();
-        return dto.get().getNumber();
+        return dto.map(officeNumberDTO -> officeNumberDTO.getNumber() + 1).orElse(1L);
     }
 
     /**
@@ -146,7 +153,12 @@ public class PaymentDocumentService {
         } else return "notAllowed";
     }
 
-
+    /**
+     * @Description: Deletes a paymentDocument
+     * @param docId - used to find the document
+     * @param request - used to find the current user
+     * @return String
+     */
     public String deletePaymentDocument(String docId, HttpServletRequest request){
         if (userService.getCurrentUser(request).isEmpty()){
             return "youAreNotLoggedIn";

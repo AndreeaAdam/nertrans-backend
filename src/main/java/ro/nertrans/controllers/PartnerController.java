@@ -6,13 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ro.nertrans.JSON.StringSuccessJSON;
-import ro.nertrans.JSON.SuccessJSON;
-import ro.nertrans.dtos.UserDTO;
-import ro.nertrans.dtos.UserEditDTO;
 import ro.nertrans.models.Partner;
 import ro.nertrans.services.PartnerService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 
 @CrossOrigin
 @RestController
@@ -49,6 +47,12 @@ public class PartnerController {
     public ResponseEntity<?> getPartnerById(@RequestParam(value = "partnerId") String partnerId,
                                             HttpServletRequest request) {
         return new ResponseEntity<>(partnerService.getPartnerById(request, partnerId), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/getPartners", method = RequestMethod.POST)
+    @ApiResponse(description = "Returns partners from a list of ids")
+    public ResponseEntity<?> getPartners(@RequestBody ArrayList<String> ids) {
+        return new ResponseEntity<>(partnerService.getPartners(ids), HttpStatus.OK);
     }
 
 

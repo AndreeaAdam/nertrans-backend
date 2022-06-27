@@ -3,8 +3,6 @@ package ro.nertrans.controllers;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -18,7 +16,6 @@ import org.springframework.web.servlet.ModelAndView;
 import ro.nertrans.JSON.StringSuccessJSON;
 import ro.nertrans.JSON.SuccessJSON;
 import ro.nertrans.config.CustomAuthenticationProvider;
-import ro.nertrans.config.UserRoleEnum;
 import ro.nertrans.dtos.UserDTO;
 import ro.nertrans.dtos.UserEditDTO;
 import ro.nertrans.dtos.UserLoginDTO;
@@ -28,8 +25,6 @@ import ro.nertrans.services.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.io.File;
-import java.util.ArrayList;
 
 @RestController
 @CrossOrigin
@@ -46,15 +41,15 @@ public class UserController {
     /**
      * @Description: Register user
      * @param user - the actual user being registered
-     * @param  - used to find the current user
+     * @param  request- used to find the current user
      * @return StringSuccessJSON
      */
-//    @Secured({"ROLE_super_admin"})
+    @Secured({"ROLE_super_admin"})
     @RequestMapping(value = "/addUser", method = RequestMethod.POST)
     @ApiResponse(description = "Registers an user")
-    public ResponseEntity<?> addUser(@RequestBody UserDTO user) {
-        String response = userService.addUser( user);
-        if (response.equals("emailExists") || response.equals("emailNotValid") || response.equals("notAllowed") || response.equals("passwordTooShort")) {
+    public ResponseEntity<?> addUser(@RequestBody UserDTO user, HttpServletRequest request) {
+        String response = userService.addUser(user, request);
+        if (response.equals("emailExists") || response.equals("youAreNotLoggedIn") || response.equals("notAllowed") || response.equals("passwordTooShort")) {
             return new ResponseEntity<>(new StringSuccessJSON(false, response), HttpStatus.BAD_REQUEST);
         } else
             return new ResponseEntity<>(new StringSuccessJSON(true, response), HttpStatus.CREATED);
@@ -66,7 +61,7 @@ public class UserController {
      * @return successJSON/stringSuccessJSON
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    @ApiResponse(description = "logs in a user ")
+    @ApiResponse(description = "Logs in a user ")
     public ResponseEntity<?> login(@RequestBody UserLoginDTO userLogin, HttpServletRequest request) {
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userLogin.getEmail(), userLogin.getPassword());
         if (userRepository.getByEmail(userLogin.getEmail()).isEmpty()) {
@@ -100,7 +95,7 @@ public class UserController {
     }
 
     /**
-     * @Description: Returns an user by id
+     * @Description: Returns a user by id
      * @param userId - id used to find the user
      * @return Optional<User>
      */
@@ -124,7 +119,10 @@ public class UserController {
     @RequestMapping(value = "/sendRegistrationEmail", method = RequestMethod.GET)
     @ApiResponse(description = "Sends email for activate account")
     public ResponseEntity<?> sendRegistrationEmail(@RequestParam(value = "userId") String userId) {
-        return new ResponseEntity<>(userService.sendRegistrationEmail(userId), HttpStatus.OK);
+        boolean response = userService.sendRegistrationEmail(userId);
+        if (response){
+            return new ResponseEntity<>(new SuccessJSON(true), HttpStatus.OK);
+        }else return new ResponseEntity<>(new SuccessJSON(false), HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -154,14 +152,17 @@ public class UserController {
     /**
      * @Description: Deletes permanently a user
      * @param userId - used to find the user to delete
-     * @param  - used to find the current user
+     * @param  request- used to find the current user
      * @return SuccessJSON
      */
-//    @Secured({"ROLE_super_admin"})
+    @Secured({"ROLE_super_admin"})
     @RequestMapping(value = "/deleteUser", method = RequestMethod.DELETE)
     @ApiResponse(description = "Deletes an user (only for super admin)")
-    public ResponseEntity<?> deleteUser(@RequestParam(value = "userId") String userId) {
-        return new ResponseEntity<>(new SuccessJSON(userService.deleteUser(userId)), HttpStatus.OK);
+    public ResponseEntity<?> deleteUser(@RequestParam(value = "userId") String userId, HttpServletRequest request) {
+        boolean response = userService.deleteUser(userId, request);
+        if (response){
+            return new ResponseEntity<>(new SuccessJSON(true), HttpStatus.OK);
+        }else return new ResponseEntity<>(new SuccessJSON(false), HttpStatus.BAD_REQUEST);
     }
     @Secured({"ROLE_super_admin"})
     @RequestMapping(value = "/changePasswordForUser", method = RequestMethod.PUT)

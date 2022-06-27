@@ -21,6 +21,9 @@ public class SettingService {
     @Autowired
     private UserService userService;
 
+    /**
+     * @Description: Creates setting when application is first running
+     */
     @EventListener(ApplicationReadyEvent.class)
     public void createSetting() {
         if (settingRepository.findAll().size() == 0) {
@@ -46,12 +49,14 @@ public class SettingService {
             setting1.get().setSmartBillEmail(setting.getSmartBillEmail());
             setting1.get().setSmartBillToken(setting.getSmartBillToken());
             setting1.get().setUserOffices(setting.getUserOffices());
+            setting1.get().setEuPlatescKey(setting.getEuPlatescKey());
+            setting1.get().setEuPlatescMerchId(setting.getEuPlatescMerchId());
             if (setting1.get().getOfficeNumber() == null) {
                 setting1.get().setOfficeNumber(new ArrayList<>());
             }
             setting1.get().getUserOffices().forEach(office -> {
-                if (setting1.get().getOfficeNumber().stream().noneMatch(s -> s.getOffice().equals(office))) {
-                    setting1.get().getOfficeNumber().add(new OfficeNumberDTO(office, 0L));
+                if (setting1.get().getOfficeNumber().stream().noneMatch(s -> s.getOffice().equals(office.getCode()))) {
+                    setting1.get().getOfficeNumber().add(new OfficeNumberDTO(office.getCode(), 0L));
                 }
             });
             settingRepository.save(setting1.get());

@@ -42,7 +42,9 @@ public class UserService implements UserDetailsService {
     @Value("${apiUrlPort}")
     private String apiUrlPort;
 
-
+    /**
+     * @Description: Creates the super admin, when application is first running
+     */
     @EventListener(ApplicationReadyEvent.class)
     private void createSuperAdmin() {
         boolean adminExists = userRepository.existsById("1");
@@ -62,15 +64,20 @@ public class UserService implements UserDetailsService {
         }
     }
 
-  //todo: uncomment this + add description
-    public String addUser( UserDTO user){
-//        if (getCurrentUser(request).isEmpty()){
-//            return "youAreNotLoggedIn";
-//        }
-//        Optional<User> currentUser = getCurrentUser(request);
-//        if (!currentUser.get().getRoles().contains(UserRoleEnum.ROLE_super_admin)){
-//            return "notAllowed";
-//        }
+    /**
+     * @Description: Creates a new user account
+     * @param user - the new user
+     * @param request - used to find the current user
+     * @return String
+     */
+    public String addUser( UserDTO user, HttpServletRequest request){
+        if (getCurrentUser(request).isEmpty()){
+            return "youAreNotLoggedIn";
+        }
+        Optional<User> currentUser = getCurrentUser(request);
+        if (!currentUser.get().getRoles().contains(UserRoleEnum.ROLE_super_admin)){
+            return "notAllowed";
+        }
         if (userRepository.getByEmail(user.getEmail()).isPresent()) {
             return "emailExists";
         }
@@ -97,6 +104,11 @@ public class UserService implements UserDetailsService {
         return user1.getId();
     }
 
+    /**
+     * @Description: Sends email for activate account
+     * @param userId - used to find the user
+     * @return boolean
+     */
     public boolean sendRegistrationEmail(String userId) {
         Optional<User> user = userRepository.findById(userId);
         if (user.get().isActive()) {
@@ -118,7 +130,7 @@ public class UserService implements UserDetailsService {
 
     /**
      * @Description: Creates a registration code for the user
-     * @Details: The code has an expiry date set at current date + 1 week
+     * @Details: The code has an expiry date set at current date + 2 days
      * @param userEmail - string used to find the userEmail
      * @param userId - id used to find the user
      * @param registrationCode - string used to find the registrationCode
@@ -138,7 +150,9 @@ public class UserService implements UserDetailsService {
      * @return Optional<User>
      */
     public Optional<User> getCurrentUser(HttpServletRequest request) {
-        return userRepository.getByEmail(request.getUserPrincipal().getName());
+        if (request == null){
+            return Optional.empty();
+        }else return userRepository.getByEmail(request.getUserPrincipal().getName());
     }
     /**
      * @Description: Returns a list with all users
@@ -223,14 +237,14 @@ public class UserService implements UserDetailsService {
     /**
      * @Description: Deletes permanently a user
      * @param userId - used to find the user to delete
-     * @param  - used to find the current user
+     * @param  request- used to find the current user
      * @return boolean
      */
-    public boolean deleteUser(String userId) {
-//        if (getCurrentUser(request).get().getRoles().contains(UserRoleEnum.ROLE_super_admin) && userRepository.existsById(userId)) {
+    public boolean deleteUser(String userId, HttpServletRequest request) {
+        if (getCurrentUser(request).get().getRoles().contains(UserRoleEnum.ROLE_super_admin) && userRepository.existsById(userId)) {
             userRepository.deleteById(userId);
             return true;
-//        } else return false;
+        } else return false;
     }
 
 

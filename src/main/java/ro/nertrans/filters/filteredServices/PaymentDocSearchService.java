@@ -55,7 +55,7 @@ public class PaymentDocSearchService {
         Optional<User> user = userService.getCurrentUser(request);
         Criteria docSeriesCriteria;
         if (!user.get().getRoles().contains(UserRoleEnum.ROLE_super_admin)) {
-            docSeriesCriteria = Criteria.where("docSeries").is(user.get().getOffice().split(" "));
+            docSeriesCriteria = Criteria.where("docSeries").is(user.get().getOffice());
             dynamicQuery.addCriteria(docSeriesCriteria);
         } else {
             if (paymentDocumentSearchDTO.getDocSeries() != null) {

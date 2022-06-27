@@ -8,6 +8,8 @@ import ro.nertrans.repositories.PartnerRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -47,8 +49,7 @@ public class PartnerService {
     public Object getPartnerById(HttpServletRequest request, String partnerId){
         if (userService.getCurrentUser(request).isEmpty()){
             return "youAreNotLoggedIn";
-        }else
-        return partnerRepository.findById(partnerId);
+        }else return partnerRepository.findById(partnerId);
     }
 
     /**
@@ -90,5 +91,20 @@ public class PartnerService {
         partner1.get().setRegistrationCode(partner.getRegistrationCode());
         partnerRepository.save(partner1.get());
         return "success";
+    }
+
+    /**
+     * @Description: Returns partners from a list of ids
+     * @param ids - array
+     * @return List<Partner>
+     */
+    public List<Partner> getPartners(ArrayList<String> ids){
+        List<Partner> partners = new ArrayList<>();
+        for (String id: ids) {
+            if (partnerRepository.findById(id).isPresent()){
+                partners.add(partnerRepository.findById(id).get());
+            }
+        }
+        return partners;
     }
 }
