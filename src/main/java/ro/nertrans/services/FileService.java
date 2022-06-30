@@ -52,63 +52,101 @@ public class FileService {
         }
     }
 
+//    public ResponseEntity<?> uploadDocAttachments(ArrayList<MultipartFile> files, HttpServletRequest request, String docId) {
+//        if (userService.getCurrentUser(request).isEmpty()){
+//            response = new ResponseEntity<>(new StringSuccessJSON(false, "youAreNotLoggedIn"), HttpStatus.BAD_REQUEST);
+//        }
+//        if (paymentDocumentRepository.findById(docId).isEmpty()){
+//            response = new ResponseEntity<>(new StringSuccessJSON(false, "invalidId"), HttpStatus.BAD_REQUEST);
+//        }
+//
+//        try {
+//            for (MultipartFile file : files) {
+//                //File extension limitations
+//                if (!file.isEmpty()) {
+//                    byte[] bytes = file.getBytes();
+//                    Optional<User> currentUser = userService.getCurrentUser(request);
+//                    Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findById(docId);
+//                    File paymentDocumentLocation = new File(uploadDirectory + File.separator + "paymentDocuments" + File.separator + docId);
+//                    String fileName = file.getOriginalFilename();
+//                    File serverFile = new File(paymentDocumentLocation.getAbsolutePath() + File.separator + fileName);
+//                    try {
+//                        ArrayList<FileDTO> attachments = new ArrayList<>();
+//                        if (paymentDocument.get().getAttachment()!= null) {
+//                            attachments = paymentDocument.get().getAttachment();
+//                        }
+//                        // Writes the image
+//                        BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+//                        stream.write(bytes);
+//                        serverFile.setWritable(true, true);
+//                        serverFile.setReadable(true, false);
+//                        serverFile.setExecutable(true, false);
+//                        stream.close();
+//
+//                        FileDTO dto = new FileDTO();
+//                        dto.setFileName(serverFile.getName());
+//                        dto.setFilePath(apiUrlPort + request.getContextPath() + File.separator + "files" + File.separator + "users" + File.separator + currentUser.get().getId() + File.separator + "brandIcons" + File.separator + fileName);
+//
+//                        attachments.add(dto);
+//                        paymentDocument.get().setAttachment(attachments);
+//                        paymentDocumentRepository.save(paymentDocument.get());
+//                        response = new ResponseEntity<>(new StringSuccessJSON(true, fileName), HttpStatus.OK);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                        response = new ResponseEntity<>(new StringSuccessJSON(false, "File Upload Failure.."), HttpStatus.BAD_REQUEST);
+//                    }
+//                } else {
+//                    response = new ResponseEntity<>(new StringSuccessJSON(false, "File of wrong extension type or upload problem"), HttpStatus.BAD_REQUEST);
+//                }
+//            }
+//        } catch (Exception e) {
+//            response = new ResponseEntity<>(new StringSuccessJSON(false, "File Upload Failure.."), HttpStatus.BAD_REQUEST);
+//        }
+//        return response;
+//    }
 
-    /**
-     * @Description: Uploads an array of brand icons for a specific paymentDoc
-     * @param files - the actual files being uploaded
-     * @param request - used to find out the current user
-     * @return false + Brand Icons File Upload Failure.
-     */
-    public ResponseEntity<?> uploadDocAttachments(ArrayList<MultipartFile> files, HttpServletRequest request, String docId) {
-        if (userService.getCurrentUser(request).isEmpty()){
-            response = new ResponseEntity<>(new StringSuccessJSON(false, "youAreNotLoggedIn"), HttpStatus.BAD_REQUEST);
-        }
-        if (paymentDocumentRepository.findById(docId).isEmpty()){
-            response = new ResponseEntity<>(new StringSuccessJSON(false, "invalidId"), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<?> uploadDocAttachment(MultipartFile file, HttpServletRequest request, String docId) {
 
         try {
-            for (MultipartFile file : files) {
-                //File extension limitations
-                if (!file.isEmpty()) {
-                    byte[] bytes = file.getBytes();
-                    Optional<User> currentUser = userService.getCurrentUser(request);
-                    Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findById(docId);
-                    File paymentDocumentLocation = new File(uploadDirectory + File.separator + "paymentDocuments" + File.separator + docId);
-                    String fileName = file.getOriginalFilename();
-                    File serverFile = new File(paymentDocumentLocation.getAbsolutePath() + File.separator + fileName);
-                    try {
-                        ArrayList<FileDTO> attachments = new ArrayList<>();
-                        if (paymentDocument.get().getAttachments()!= null) {
-                            attachments = paymentDocument.get().getAttachments();
-                        }
-                        // Writes the image
-                        BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
-                        stream.write(bytes);
-                        serverFile.setWritable(true, true);
-                        serverFile.setReadable(true, false);
-                        serverFile.setExecutable(true, false);
-                        stream.close();
-
-                        FileDTO dto = new FileDTO();
-                        dto.setFileName(serverFile.getName());
-                        dto.setFilePath(apiUrlPort + request.getContextPath() + File.separator + "files" + File.separator + "users" + File.separator + currentUser.get().getId() + File.separator + "brandIcons" + File.separator + fileName);
-
-                        attachments.add(dto);
-                        paymentDocument.get().setAttachments(attachments);
-                        paymentDocumentRepository.save(paymentDocument.get());
-                        response = new ResponseEntity<>(new StringSuccessJSON(true, fileName), HttpStatus.OK);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        response = new ResponseEntity<>(new StringSuccessJSON(false, "File Upload Failure.."), HttpStatus.BAD_REQUEST);
+            //File extension limitations
+            if (!file.isEmpty()) {
+            /*
+            Check image
+             */
+                byte[] bytes = file.getBytes();
+                Optional<PaymentDocument> document = paymentDocumentRepository.findById(docId);
+                File paymentDocumentLocation = new File(uploadDirectory + File.separator + "paymentDocuments" + File.separator + docId);
+                String fileName = file.getName();
+                File serverFile = new File(paymentDocumentLocation.getAbsolutePath() + File.separator + fileName);
+                try {
+                    FileDTO dto = new FileDTO();
+                    if (document.get().getAttachment() != null){
+                        dto = document.get().getAttachment();
                     }
-                } else {
-                    response = new ResponseEntity<>(new StringSuccessJSON(false, "File of wrong extension type or upload problem"), HttpStatus.BAD_REQUEST);
+                    //deletes the old image
+                    File oldFileLocation = new File(uploadDirectory + File.separator + "paymentDocuments" + File.separator + docId + File.separator + dto.getFileName());
+                    oldFileLocation.delete();
+                    // Writes the image
+                    BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+                    stream.write(bytes);
+                    serverFile.setWritable(true, true);
+                    serverFile.setReadable(true, false);
+                    serverFile.setExecutable(true, false);
+                    stream.close();
+                    dto.setFileName(serverFile.getName());
+                    dto.setFilePath(apiUrlPort + request.getContextPath() +File.separator + "files" + File.separator + "paymentDocuments" + File.separator + docId + File.separator + fileName);
+                    document.get().setAttachment(dto);
+                    paymentDocumentRepository.save(document.get());
+                    return new ResponseEntity<>(new StringSuccessJSON(true, fileName), HttpStatus.OK);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return new ResponseEntity<>(new StringSuccessJSON(false, "Icon Upload Failure.."), HttpStatus.BAD_REQUEST);
                 }
+            } else {
+                return new ResponseEntity<>(new StringSuccessJSON(false, "File of wrong extension type or upload problem"), HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
-            response = new ResponseEntity<>(new StringSuccessJSON(false, "File Upload Failure.."), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new StringSuccessJSON(false, "Icon Upload Failure.."), HttpStatus.BAD_REQUEST);
         }
-        return response;
     }
 }

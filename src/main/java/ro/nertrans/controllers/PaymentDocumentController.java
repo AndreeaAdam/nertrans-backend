@@ -70,12 +70,12 @@ public class PaymentDocumentController {
             return new ResponseEntity<>(new StringSuccessJSON(false, response), HttpStatus.BAD_REQUEST);
     }
 
-    @RequestMapping(value = "/uploadDocAttachments", method = RequestMethod.POST,
+    @RequestMapping(value = "/uploadDocAttachment", method = RequestMethod.POST,
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> uploadDocAttachments(@RequestParam("files") ArrayList<MultipartFile> files,
+    public ResponseEntity<?> uploadDocAttachment(@RequestParam("file") MultipartFile file,
                                                   HttpServletRequest request,
                                                   @RequestParam("docId") String docId) {
-        return fileService.uploadDocAttachments(files, request, docId);
+        return fileService.uploadDocAttachment(file, request, docId);
     }
 
     @RequestMapping(value = "/getPaymentDocumentById", method = RequestMethod.GET)

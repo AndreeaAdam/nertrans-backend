@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PartnerSearchDTO {
 
-    private String registrationCode;
+    private String CUI;
     private String name;
     private String address;
     private String email;

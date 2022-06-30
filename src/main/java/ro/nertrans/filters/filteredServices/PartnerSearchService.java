@@ -59,8 +59,8 @@ public class PartnerSearchService {
             Criteria partnerNameCriteria = Criteria.where("name").regex(partnerSearchDTO.getName(), "i");
             dynamicQuery.addCriteria(partnerNameCriteria);
         }
-        if (partnerSearchDTO.getRegistrationCode() != null) {
-            Criteria partnerRegistrationCodeCriteria = Criteria.where("registrationCode").is(partnerSearchDTO.getRegistrationCode());
+        if (partnerSearchDTO.getCUI() != null) {
+            Criteria partnerRegistrationCodeCriteria = Criteria.where("CUI").is(partnerSearchDTO.getCUI());
             dynamicQuery.addCriteria(partnerRegistrationCodeCriteria);
         }
         if (partnerSearchDTO.getAddress() != null) {

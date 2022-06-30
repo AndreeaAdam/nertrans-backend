@@ -9,7 +9,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import ro.nertrans.dtos.FileDTO;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 
 /**
  * @Description: Model class that stores each payment document
@@ -46,8 +45,8 @@ public class PaymentDocument {
     @Field("fiscalBill")
     private String fiscalBill;
 
-    @Field("attachments")
-    private ArrayList<FileDTO> attachments;
+    @Field("attachment")
+    private FileDTO attachment;
 
     @Field("docNumber")
     private Long docNumber;
@@ -55,6 +54,12 @@ public class PaymentDocument {
     @Field("docSeries")
     private String docSeries;
 
+    @Field("localReferenceNumber")
+    private String localReferenceNumber;
+
     @Field("date")
     private LocalDateTime date;
+
+    @Field("partnerName")
+    private String partnerName;
 }

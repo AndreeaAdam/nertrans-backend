@@ -20,8 +20,8 @@ public class Partner {
     @Id
     private String id;
 
-    @Field("registrationCode")
-    private String registrationCode;
+    @Field("CUI")
+    private String CUI;
 
     @Field("name")
     private String name;

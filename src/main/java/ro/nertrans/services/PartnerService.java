@@ -3,21 +3,26 @@ package ro.nertrans.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ro.nertrans.models.Partner;
+import ro.nertrans.models.PaymentDocument;
 import ro.nertrans.models.User;
 import ro.nertrans.repositories.PartnerRepository;
+import ro.nertrans.repositories.PaymentDocumentRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PartnerService {
     @Autowired
     private PartnerRepository partnerRepository;
     @Autowired
-    UserService userService;
+    private UserService userService;
+    @Autowired
+    private PaymentDocumentRepository paymentDocumentRepository;
 
     /**
      * @Description: Creates a new partner
@@ -29,8 +34,8 @@ public class PartnerService {
         if (userService.getCurrentUser(request).isEmpty()){
             return "youAreNotLoggedIn";
         }
-        if (partnerRepository.getByRegistrationCodeIgnoreCase(partner.getRegistrationCode()) != null) {
-            return "registrationCodeMustBeUnique";
+        if (partnerRepository.getByCUIIgnoreCase(partner.getCUI()) != null) {
+            return "CUIMustBeUnique";
         }
         Optional<User> currentUser = userService.getCurrentUser(request);
         partner.setId(null);
@@ -75,8 +80,8 @@ public class PartnerService {
      * @param partnerId - used to find the partner to update
      * @return String
      */
-    public String updatePartner(HttpServletRequest request, Partner partner, String partnerId){
-        if (userService.getCurrentUser(request).isEmpty()){
+    public String updatePartner(HttpServletRequest request, Partner partner, String partnerId) {
+        if (userService.getCurrentUser(request).isEmpty()) {
             return "youAreNotLoggedIn";
         }
         Optional<Partner> partner1 = partnerRepository.findById(partnerId);
@@ -84,11 +89,18 @@ public class PartnerService {
         partner1.get().setTelephone(partner.getTelephone());
         partner1.get().setEmail(partner.getEmail());
         partner1.get().setName(partner.getName());
-        if (partnerRepository.getByRegistrationCodeIgnoreCase(partner.getRegistrationCode()) != null &&
-                !partnerRepository.getByRegistrationCodeIgnoreCase(partner.getRegistrationCode()).getId().equalsIgnoreCase(partnerId)){
+        if (partnerRepository.getByCUIIgnoreCase(partner.getCUI()) != null &&
+                !partnerRepository.getByCUIIgnoreCase(partner.getCUI()).getId().equalsIgnoreCase(partnerId)) {
             return "registrationCodeMustBeUnique";
         }
-        partner1.get().setRegistrationCode(partner.getRegistrationCode());
+        if (!partner.getName().equalsIgnoreCase(partner1.get().getName())) {
+            List<PaymentDocument> documents = paymentDocumentRepository.findAll().stream().filter(paymentDocument -> paymentDocument.getPartnerId().equalsIgnoreCase(partnerId)).collect(Collectors.toList());
+            documents.forEach(paymentDocument -> {
+                paymentDocument.setPartnerName(partner.getName());
+                paymentDocumentRepository.save(paymentDocument);
+            });
+        }
+        partner1.get().setCUI(partner.getCUI());
         partnerRepository.save(partner1.get());
         return "success";
     }

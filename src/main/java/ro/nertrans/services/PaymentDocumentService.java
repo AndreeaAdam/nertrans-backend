@@ -7,6 +7,7 @@ import ro.nertrans.dtos.OfficeNumberDTO;
 import ro.nertrans.models.PaymentDocument;
 import ro.nertrans.models.Setting;
 import ro.nertrans.models.User;
+import ro.nertrans.repositories.PartnerRepository;
 import ro.nertrans.repositories.PaymentDocumentRepository;
 import ro.nertrans.repositories.SettingRepository;
 
@@ -27,6 +28,8 @@ public class PaymentDocumentService {
     private SettingService settingService;
     @Autowired
     private SettingRepository settingRepository;
+    @Autowired
+    private PartnerRepository partnerRepository;
 
     /**
      * @Description: Creates a new payment document
@@ -45,6 +48,10 @@ public class PaymentDocumentService {
         paymentDocument.setDate(LocalDateTime.now());
         paymentDocument.setUserId(userService.getCurrentUser(request).get().getId());
         paymentDocument.setDocNumber(incrementDocNumberByOffice(paymentDocument.getDocSeries()));
+        if (paymentDocument.getPartnerId() != null && partnerRepository.findById(paymentDocument.getPartnerId()).isPresent()){
+            paymentDocument.setPartnerName(partnerRepository.findById(paymentDocument.getPartnerId()).get().getName());
+        }
+        paymentDocument.setLocalReferenceNumber(paymentDocument.getDocSeries() + " " + paymentDocument.getDocNumber());
         paymentDocumentRepository.save(paymentDocument);
         fileService.createPaymentDocumentFolder(paymentDocument.getId());
         return paymentDocument.getId();
@@ -65,10 +72,12 @@ public class PaymentDocumentService {
             return "invalidId";
         }
         Optional<PaymentDocument> paymentDocument1 = paymentDocumentRepository.findById(paymentDocId);
-        if (!userService.getCurrentUser(request).get().getOffice().equalsIgnoreCase(paymentDocument1.get().getDocSeries()) || (!paymentDocument1.get().getStatus().equalsIgnoreCase("În așteptare") && !userService.getCurrentUser(request).get().getRoles().contains(UserRoleEnum.ROLE_super_admin))) {
-            return "youCannotEditThisDocument";
+        if (!userService.getCurrentUser(request).get().getRoles().contains(UserRoleEnum.ROLE_super_admin)){
+            if (!userService.getCurrentUser(request).get().getOffice().equalsIgnoreCase(paymentDocument1.get().getDocSeries()) || !paymentDocument1.get().getStatus().equalsIgnoreCase("În așteptare")){
+                return "youCannotEditThisDocument";
+            }
         }
-        paymentDocument1.get().setAttachments(paymentDocument.getAttachments());
+        paymentDocument1.get().setAttachment(paymentDocument.getAttachment());
         paymentDocument1.get().setName(paymentDocument.getName());
         paymentDocument1.get().setPaymentMethod(paymentDocument.getPaymentMethod());
         paymentDocument1.get().setCurrency(paymentDocument.getCurrency());
@@ -76,6 +85,10 @@ public class PaymentDocumentService {
         paymentDocument1.get().setFiscalBill(paymentDocument.getFiscalBill());
         paymentDocument1.get().setStatus(paymentDocument.getStatus());
         paymentDocument1.get().setPartnerId(paymentDocument.getPartnerId());
+        paymentDocument1.get().setLocalReferenceNumber(paymentDocument.getDocSeries() + " " + paymentDocument.getDocNumber());
+        if (paymentDocument.getPartnerId() != null && partnerRepository.findById(paymentDocument.getPartnerId()).isPresent()){
+            paymentDocument1.get().setPartnerName(partnerRepository.findById(paymentDocument.getPartnerId()).get().getName());
+        }
         paymentDocumentRepository.save(paymentDocument1.get());
         return "success";
     }
