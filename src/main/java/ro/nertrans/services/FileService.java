@@ -9,14 +9,12 @@ import org.springframework.web.multipart.MultipartFile;
 import ro.nertrans.JSON.StringSuccessJSON;
 import ro.nertrans.dtos.FileDTO;
 import ro.nertrans.models.PaymentDocument;
-import ro.nertrans.models.User;
 import ro.nertrans.repositories.PaymentDocumentRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
@@ -108,7 +106,6 @@ public class FileService {
     public ResponseEntity<?> uploadDocAttachment(MultipartFile file, HttpServletRequest request, String docId) {
 
         try {
-            //File extension limitations
             if (!file.isEmpty()) {
             /*
             Check image
@@ -116,11 +113,11 @@ public class FileService {
                 byte[] bytes = file.getBytes();
                 Optional<PaymentDocument> document = paymentDocumentRepository.findById(docId);
                 File paymentDocumentLocation = new File(uploadDirectory + File.separator + "paymentDocuments" + File.separator + docId);
-                String fileName = file.getName();
+                String fileName = file.getOriginalFilename();
                 File serverFile = new File(paymentDocumentLocation.getAbsolutePath() + File.separator + fileName);
                 try {
                     FileDTO dto = new FileDTO();
-                    if (document.get().getAttachment() != null){
+                    if (document.get().getAttachment() != null) {
                         dto = document.get().getAttachment();
                     }
                     //deletes the old image
@@ -134,19 +131,19 @@ public class FileService {
                     serverFile.setExecutable(true, false);
                     stream.close();
                     dto.setFileName(serverFile.getName());
-                    dto.setFilePath(apiUrlPort + request.getContextPath() +File.separator + "files" + File.separator + "paymentDocuments" + File.separator + docId + File.separator + fileName);
+                    dto.setFilePath(apiUrlPort + request.getContextPath() + File.separator + "files" + File.separator + "paymentDocuments" + File.separator + docId + File.separator + fileName);
                     document.get().setAttachment(dto);
                     paymentDocumentRepository.save(document.get());
                     return new ResponseEntity<>(new StringSuccessJSON(true, fileName), HttpStatus.OK);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    return new ResponseEntity<>(new StringSuccessJSON(false, "Icon Upload Failure.."), HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>(new StringSuccessJSON(false, "uploadFailure"), HttpStatus.BAD_REQUEST);
                 }
             } else {
-                return new ResponseEntity<>(new StringSuccessJSON(false, "File of wrong extension type or upload problem"), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(new StringSuccessJSON(false, "fileCannotBeEmpty"), HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
-            return new ResponseEntity<>(new StringSuccessJSON(false, "Icon Upload Failure.."), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new StringSuccessJSON(false, "uploadFailure"), HttpStatus.BAD_REQUEST);
         }
     }
 }

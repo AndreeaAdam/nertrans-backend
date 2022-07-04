@@ -5,8 +5,8 @@ Certificate:
     Signature Algorithm: md5WithRSAEncryption
         Issuer: C=RO, ST=Bucharest, L=Bucharest, O=N E T O P I A , OU=N E T O P I A Development Team, CN=mobilpay.ro/emailAddress=support@mobilpay.ro
         Validity
-            Not Before: Apr  6 20:16:47 2020 GMT
-            Not After : Apr  6 20:16:47 2021 GMT
+            Not Before: Jul  4 08:28:13 2022 GMT
+            Not After : Jul  4 08:28:13 2023 GMT
         Subject: C=RO, ST=Bucharest, L=Bucharest, O=N E T O P I A , OU=N E T O P I A Development Team, CN=mobilpay.ro/emailAddress=support@mobilpay.ro
         Subject Public Key Info:
             Public Key Algorithm: rsaEncryption
@@ -31,21 +31,21 @@ Certificate:
             X509v3 Basic Constraints: 
                 CA:TRUE
     Signature Algorithm: md5WithRSAEncryption
-         3c:e3:5a:03:1c:6b:bb:c5:f3:09:1a:32:49:e2:54:cc:2a:e6:
-         5b:90:46:a9:71:c8:45:5c:63:fb:29:68:70:d5:60:88:25:45:
-         b0:07:f0:d1:5f:d0:8f:e4:6a:2f:e8:09:14:ff:f3:7b:d9:e9:
-         1c:b6:7f:92:67:a9:16:40:94:f3:5e:34:b7:9f:73:57:fc:09:
-         cf:db:eb:26:88:38:9b:97:6d:81:ac:f7:40:16:22:41:42:ce:
-         a3:1d:7e:c9:b3:db:13:fb:47:d5:a5:db:6e:91:7f:0c:5d:b6:
-         f4:18:7d:d9:c3:6c:aa:73:73:16:7f:a4:a9:3f:10:e4:ca:38:
-         95:b4
+         8c:04:f4:a2:bd:5a:7e:6b:32:e7:d0:25:55:cb:9f:9f:03:79:
+         c8:26:55:5b:9c:1c:d2:eb:66:a3:69:93:68:73:8e:be:f4:0b:
+         5e:b1:f2:7e:e8:e0:c0:57:d6:03:ac:79:b5:4b:ef:99:d1:bc:
+         cc:97:d9:7c:91:97:9e:dd:d6:1c:5a:f4:9d:81:f4:a2:85:c2:
+         be:1e:63:54:c2:01:92:ca:21:15:49:2d:8c:ff:3c:cb:37:38:
+         d9:d8:3a:e8:74:7a:4b:9a:ab:a9:60:90:9d:aa:b5:9b:5b:44:
+         7c:a6:f9:55:4a:75:a6:ed:0c:02:6a:db:3f:7a:b7:b3:39:84:
+         d7:3e
 -----BEGIN CERTIFICATE-----
 MIIDKjCCApOgAwIBAgIBADANBgkqhkiG9w0BAQQFADCBsTELMAkGA1UEBhMCUk8x
 EjAQBgNVBAgMCUJ1Y2hhcmVzdDESMBAGA1UEBwwJQnVjaGFyZXN0MRcwFQYDVQQK
 DA5OIEUgVCBPIFAgSSBBIDEnMCUGA1UECwweTiBFIFQgTyBQIEkgQSBEZXZlbG9w
 bWVudCBUZWFtMRQwEgYDVQQDDAttb2JpbHBheS5ybzEiMCAGCSqGSIb3DQEJARYT
-c3VwcG9ydEBtb2JpbHBheS5ybzAeFw0yMDA0MDYyMDE2NDdaFw0yMTA0MDYyMDE2
-NDdaMIGxMQswCQYDVQQGEwJSTzESMBAGA1UECAwJQnVjaGFyZXN0MRIwEAYDVQQH
+c3VwcG9ydEBtb2JpbHBheS5ybzAeFw0yMjA3MDQwODI4MTNaFw0yMzA3MDQwODI4
+MTNaMIGxMQswCQYDVQQGEwJSTzESMBAGA1UECAwJQnVjaGFyZXN0MRIwEAYDVQQH
 DAlCdWNoYXJlc3QxFzAVBgNVBAoMDk4gRSBUIE8gUCBJIEEgMScwJQYDVQQLDB5O
 IEUgVCBPIFAgSSBBIERldmVsb3BtZW50IFRlYW0xFDASBgNVBAMMC21vYmlscGF5
 LnJvMSIwIAYJKoZIhvcNAQkBFhNzdXBwb3J0QG1vYmlscGF5LnJvMIGfMA0GCSqG
@@ -54,7 +54,7 @@ xSm6j+WFYglAYNzHOWWHdXtF4vVItUCNmf4773Iaw2RkMI2qwKa90vW6MBxJGR/N
 WaJTqDxwWW2KQNvASMh2EXGk14y7YgRr46cLs5Y5l3gaFS4pyGhNCFKTHp/TC1ht
 nxjHXQIDAQABo1AwTjAdBgNVHQ4EFgQUPclwoTBsc1M0H5ZpF09aMiAaHrUwHwYD
 VR0jBBgwFoAUPclwoTBsc1M0H5ZpF09aMiAaHrUwDAYDVR0TBAUwAwEB/zANBgkq
-hkiG9w0BAQQFAAOBgQA841oDHGu7xfMJGjJJ4lTMKuZbkEapcchFXGP7KWhw1WCI
-JUWwB/DRX9CP5Gov6AkU//N72ekctn+SZ6kWQJTzXjS3n3NX/AnP2+smiDibl22B
-rPdAFiJBQs6jHX7Js9sT+0fVpdtukX8MXbb0GH3Zw2yqc3MWf6SpPxDkyjiVtA==
+hkiG9w0BAQQFAAOBgQCMBPSivVp+azLn0CVVy5+fA3nIJlVbnBzS62ajaZNoc46+
+9AtesfJ+6ODAV9YDrHm1S++Z0bzMl9l8kZee3dYcWvSdgfSihcK+HmNUwgGSyiEV
+SS2M/zzLNzjZ2DrodHpLmqupYJCdqrWbW0R8pvlVSnWm7QwCats/erezOYTXPg==
 -----END CERTIFICATE-----
