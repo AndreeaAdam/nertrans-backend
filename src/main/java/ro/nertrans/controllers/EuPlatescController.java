@@ -29,13 +29,11 @@ public class EuPlatescController {
         return null;
     }
     @RequestMapping(value = "/mobilPay", method = RequestMethod.POST)
-    public Object mobilPay(@RequestBody EuPlatescDTO dto) {
+    public Object mobilPay() {
         try {
-            netopiaService.pay(dto);
+            netopiaService.pay();
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
