@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import ro.nertrans.dtos.FileDTO;
 import ro.nertrans.dtos.OfficeDTO;
 import ro.nertrans.dtos.OfficeNumberDTO;
 
@@ -26,6 +27,9 @@ public class Setting {
     @Field("smartBillToken")
     private String smartBillToken;
 
+    @Field("smartBillFiscalCode")
+    private String smartBillFiscalCode;
+
     @Field("userOffices")
     private ArrayList<OfficeDTO> userOffices;
 
@@ -37,4 +41,13 @@ public class Setting {
 
     @Field("euPlatescMerchId")
     private String euPlatescMerchId;
+
+    @Field("netopiaSignature")
+    private String netopiaSignature;
+
+    @Field("netopiaPrivateKey")
+    private FileDTO netopiaPrivateKey;
+
+    @Field("netopiaPublicKey")
+    private FileDTO netopiaPublicKey;
 }

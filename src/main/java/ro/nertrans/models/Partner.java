@@ -40,4 +40,13 @@ public class Partner {
 
     @Field("userId")
     private String userId;
+
+    @Field("country")
+    private String country;
+
+    @Field("city")
+    private String city;
+
+    @Field("VATPayer")
+    private boolean VATPayer;
 }

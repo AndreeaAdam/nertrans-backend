@@ -82,9 +82,11 @@ public class PaymentDocumentService {
         paymentDocument1.get().setPaymentMethod(paymentDocument.getPaymentMethod());
         paymentDocument1.get().setCurrency(paymentDocument.getCurrency());
         paymentDocument1.get().setValue(paymentDocument.getValue());
-        paymentDocument1.get().setFiscalBill(paymentDocument.getFiscalBill());
+        paymentDocument1.get().setFiscalBillSeries(paymentDocument.getFiscalBillSeries());
+        paymentDocument1.get().setFiscalBillNumber(paymentDocument.getFiscalBillNumber());
         paymentDocument1.get().setStatus(paymentDocument.getStatus());
         paymentDocument1.get().setPartnerId(paymentDocument.getPartnerId());
+        paymentDocument1.get().setApplyTVA(paymentDocument.isApplyTVA());
         paymentDocument1.get().setLocalReferenceNumber(paymentDocument.getDocSeries() + " " + paymentDocument.getDocNumber());
         if (paymentDocument.getPartnerId() != null && partnerRepository.findById(paymentDocument.getPartnerId()).isPresent()){
             paymentDocument1.get().setPartnerName(partnerRepository.findById(paymentDocument.getPartnerId()).get().getName());
@@ -126,7 +128,7 @@ public class PaymentDocumentService {
             return "invalidId";
         }
         Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findById(paymentDocId);
-        paymentDocument.get().setFiscalBill(link);
+        paymentDocument.get().setFiscalBillSeries(link);
         paymentDocumentRepository.save(paymentDocument.get());
         return "success";
     }

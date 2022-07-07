@@ -42,8 +42,11 @@ public class PaymentDocument {
     @Field("status")
     private String status;
 
-    @Field("fiscalBill")
-    private String fiscalBill;
+    @Field("fiscalBillSeries")
+    private String fiscalBillSeries;
+
+    @Field("fiscalBillNumber")
+    private String fiscalBillNumber;
 
     @Field("attachment")
     private FileDTO attachment;
@@ -62,4 +65,10 @@ public class PaymentDocument {
 
     @Field("partnerName")
     private String partnerName;
+
+    @Field("applyTVA")
+    private boolean applyTVA;
+
+    @Field("billableProductName")
+    private String billableProductName;
 }

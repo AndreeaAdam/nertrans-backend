@@ -47,14 +47,11 @@ public class PartnerService {
 
     /**
      * @Description: Returns a single partner
-     * @param request - used to find the current user
      * @param partnerId - used to find the partner
      * @return Object
      */
-    public Object getPartnerById(HttpServletRequest request, String partnerId){
-        if (userService.getCurrentUser(request).isEmpty()){
-            return "youAreNotLoggedIn";
-        }else return partnerRepository.findById(partnerId);
+    public Object getPartnerById(String partnerId){
+       return partnerRepository.findById(partnerId);
     }
 
     /**
@@ -89,6 +86,9 @@ public class PartnerService {
         partner1.get().setTelephone(partner.getTelephone());
         partner1.get().setEmail(partner.getEmail());
         partner1.get().setName(partner.getName());
+        partner1.get().setCity(partner.getCity());
+        partner1.get().setCountry(partner.getCountry());
+        partner1.get().setVATPayer(partner.isVATPayer());
         if (partnerRepository.getByCUIIgnoreCase(partner.getCUI()) != null &&
                 !partnerRepository.getByCUIIgnoreCase(partner.getCUI()).getId().equalsIgnoreCase(partnerId)) {
             return "registrationCodeMustBeUnique";

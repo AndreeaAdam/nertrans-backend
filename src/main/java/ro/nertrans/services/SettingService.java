@@ -20,6 +20,8 @@ public class SettingService {
     private SettingRepository settingRepository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private FileService fileService;
 
     /**
      * @Description: Creates setting when application is first running
@@ -30,6 +32,7 @@ public class SettingService {
             Setting setting = new Setting();
             setting.setId(null);
             settingRepository.save(setting);
+            fileService.createSettingFolder();
         }
     }
 
@@ -48,9 +51,13 @@ public class SettingService {
             Optional<Setting> setting1 = getSettings();
             setting1.get().setSmartBillEmail(setting.getSmartBillEmail());
             setting1.get().setSmartBillToken(setting.getSmartBillToken());
+            setting1.get().setSmartBillFiscalCode(setting.getSmartBillFiscalCode());
             setting1.get().setUserOffices(setting.getUserOffices());
             setting1.get().setEuPlatescKey(setting.getEuPlatescKey());
             setting1.get().setEuPlatescMerchId(setting.getEuPlatescMerchId());
+            setting1.get().setNetopiaSignature(setting.getNetopiaSignature());
+            setting1.get().setNetopiaPrivateKey(setting.getNetopiaPrivateKey());
+            setting1.get().setNetopiaPublicKey(setting.getNetopiaPublicKey());
             if (setting1.get().getOfficeNumber() == null) {
                 setting1.get().setOfficeNumber(new ArrayList<>());
             }

@@ -18,7 +18,6 @@ public class PartnerController {
     @Autowired
     private PartnerService partnerService;
 
-
     /**
      * @Description: Creates a new partner
      * @param partner - the new partner
@@ -38,15 +37,13 @@ public class PartnerController {
 
     /**
      * @Description: Returns a single partner
-     * @param request - used to find the current user
      * @param partnerId - used to find the partner
      * @return Object
      */
     @RequestMapping(value = "/getPartnerById", method = RequestMethod.GET)
     @ApiResponse(description = "Returns a single partner")
-    public ResponseEntity<?> getPartnerById(@RequestParam(value = "partnerId") String partnerId,
-                                            HttpServletRequest request) {
-        return new ResponseEntity<>(partnerService.getPartnerById(request, partnerId), HttpStatus.OK);
+    public ResponseEntity<?> getPartnerById(@RequestParam(value = "partnerId") String partnerId) {
+        return new ResponseEntity<>(partnerService.getPartnerById(partnerId), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/getPartners", method = RequestMethod.POST)
