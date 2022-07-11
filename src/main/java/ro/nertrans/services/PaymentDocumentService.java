@@ -168,13 +168,6 @@ public class PaymentDocumentService {
         } else return "notAllowed";
     }
 
-    public void changePaymentDocumentStatus(String orderId) {
-        Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findAll().stream().filter(paymentDocument1 -> (paymentDocument1.getDocSeries() + paymentDocument1.getDocNumber()).equalsIgnoreCase(orderId)).findFirst();
-        if (paymentDocument.isPresent()) {
-            paymentDocument.get().setStatus("Plătită");
-            paymentDocumentRepository.save(paymentDocument.get());
-        }
-    }
 
     /**
      * @Description: Deletes a paymentDocument

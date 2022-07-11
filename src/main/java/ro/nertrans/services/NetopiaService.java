@@ -6,10 +6,12 @@ import org.springframework.stereotype.Service;
 import ro.mobilPay.payment.Invoice;
 import ro.mobilPay.payment.request.Abstract;
 import ro.mobilPay.payment.request.Card;
+import ro.mobilPay.util.FileHelper;
 import ro.mobilPay.util.ListItem;
 import ro.mobilPay.util.OpenSSL;
 import ro.nertrans.dtos.MobilPayDTO;
 import ro.nertrans.dtos.NetopiaResponseDTO;
+import ro.nertrans.models.PaymentDocument;
 import ro.nertrans.repositories.PaymentDocumentRepository;
 
 import java.io.BufferedReader;
@@ -20,6 +22,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,11 +50,13 @@ public class NetopiaService {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+        System.out.println("signature " + signature);
+        System.out.println("amount " + dto.getAmount());
         Card req = new Card();
 
         req._signature = signature;
-        req._confirmUrl = "http://45.86.220.233/nertrans/cardConfirm";
-        req._returnUrl = "http://45.86.220.233/autentificare";
+        req._confirmUrl = apiUrl +"/nertrans/cardConfirm";
+        req._returnUrl = apiUrl +"/platit-cu-succes";
         req._orderId = dto.getOrderId();
         req._type = "card";
         Date date = new Date();
@@ -78,11 +83,11 @@ public class NetopiaService {
 //        inv.setBillingAddress(addr);
 //        inv.setShippingAddress(addr);
         req._invoice = inv;
+        System.out.println( "public cert" + publicCer);
         ListItem listItem = req.encrypt(String.valueOf(publicCer));
         NetopiaResponseDTO responseDTO = new NetopiaResponseDTO();
         responseDTO.setKey(listItem.key);
         responseDTO.setVal(listItem.getVal());
-        System.out.println("key " + responseDTO.getKey());
         return responseDTO;
     }
 //    public void cardConfirm(HttpServletRequest req) throws Exception {
@@ -106,28 +111,36 @@ public class NetopiaService {
 //            if (env_key == null || env_key.isEmpty()) return;
 //            if (data == null || data.isEmpty()) return;
 //            Abstract paymentRequest = Abstract.factoryFromEncrypted(env_key, data, privateKey.toString());
+//            System.out.println(paymentRequest._orderId);
 //            String action = paymentRequest._objReqNotify._action;
-//            System.out.println("action" + action);
 //            errorMessage = paymentRequest._objReqNotify._crc;
+//            Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findAll().stream().filter(paymentDocument1 -> (paymentDocument1.getDocSeries() + paymentDocument1.getDocNumber()).equalsIgnoreCase(paymentRequest._orderId)).findFirst();
 //            if (action.equalsIgnoreCase("confirmed")) {
 //                System.out.println("confirmed");
+//                paymentDocument.get().setStatus("Confirmed");
 //            } else if (action.equalsIgnoreCase("confirmed_pending")) {
+//                paymentDocument.get().setStatus("Confirmed pending");
 //                System.out.println("confirmed_pending");
 //            } else if (action.equalsIgnoreCase("paid_pending")) {
+//                paymentDocument.get().setStatus("Paid pending");
 //                System.out.println("paid_pending");
 //            } else if (action.equalsIgnoreCase("paid")) {
+//                paymentDocument.get().setStatus("Paid");
 //                System.out.println("paid");
 //            } else if (action.equalsIgnoreCase("canceled")) {
+//                paymentDocument.get().setStatus("Canceled");
 //                System.out.println("canceled");
 //            } else if (action.equalsIgnoreCase("credit")) {
+//                paymentDocument.get().setStatus("Credit");
 //                System.out.println("credit");
 //            }
+//            paymentDocumentRepository.save(paymentDocument.get());
 //        }//end if is post
 //        System.out.print("<crc>" + errorMessage + "</crc>");
 //    }
 
     //    }
-    public String cardConfirm(String env_key, String data) throws Exception {
+    public void cardConfirm(String env_key, String data) throws Exception {
         OpenSSL.extraInit();
         URL url = new URL(settingService.getSettings().get().getNetopiaPrivateKey().getFilePath());
         StringBuilder privateKey = new StringBuilder("");
@@ -146,197 +159,36 @@ public class NetopiaService {
         HttpURLConnection con = (HttpURLConnection) confirmUrl.openConnection();
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "application/json");
-        System.out.println("env_key " + env_key);
         if (con.getRequestMethod().equalsIgnoreCase("post")) {
-            if (env_key == null || env_key.isEmpty()) return null;
-            if (data == null || data.isEmpty()) return null;
+            if (env_key == null || env_key.isEmpty()) return ;
+            if (data == null || data.isEmpty()) return ;
             Abstract paymentRequest = Abstract.factoryFromEncrypted(env_key, data, privateKey.toString());
             String action = paymentRequest._objReqNotify._action;
-            System.out.println("action " + action);
+            String orderId = paymentRequest._orderId;
+            System.out.println( "order id " + paymentRequest._orderId);
             errorMessage = paymentRequest._objReqNotify._crc;
+            Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findAll().stream().filter(paymentDocument1 -> (paymentDocument1.getDocSeries() + paymentDocument1.getDocNumber()).equalsIgnoreCase(orderId)).findFirst();
             if (action.equalsIgnoreCase("confirmed")) {
-               return "confirmed";
+                System.out.println("confirmed");
+                paymentDocument.get().setStatus("Confirmed");
             } else if (action.equalsIgnoreCase("confirmed_pending")) {
+                paymentDocument.get().setStatus("Confirmed pending");
                 System.out.println("confirmed_pending");
             } else if (action.equalsIgnoreCase("paid_pending")) {
+                paymentDocument.get().setStatus("Paid pending");
                 System.out.println("paid_pending");
             } else if (action.equalsIgnoreCase("paid")) {
+                paymentDocument.get().setStatus("Paid");
                 System.out.println("paid");
             } else if (action.equalsIgnoreCase("canceled")) {
+                paymentDocument.get().setStatus("Canceled");
                 System.out.println("canceled");
             } else if (action.equalsIgnoreCase("credit")) {
+                paymentDocument.get().setStatus("Credit");
                 System.out.println("credit");
             }
+            paymentDocumentRepository.save(paymentDocument.get());
         }
-        //end if is post
-//        System.out.print("<crc>" + errorMessage + "</crc>");
-        else return "notPostMethod";
-        return errorMessage;
     }
-//
-//    public String openssl_unseal(String data, String env_key, String prvkey) {
-//        try {
-//            StringReader sr = new StringReader(prvkey);
-//            PEMReader pm = new PEMReader(sr);
-//            System.out.println(prvkey);
-//            Object o = pm.readObject();
-//            if (o != null && o instanceof KeyPair) {
-//                KeyPair kpr = (KeyPair) o;
-//                Key key = kpr.getPrivate();
-//                Cipher ccRSA = Cipher.getInstance("RSA");
-//                ccRSA.init(2, key);
-//                byte[] envb = Base64.decode(env_key);
-//                byte[] decrkey = ccRSA.doFinal(envb);
-//                SecretKeySpec sc = new SecretKeySpec(decrkey, "ARCFOUR");
-//                Cipher cc = Cipher.getInstance("ARCFOUR");
-//                cc.init(2, sc);
-//                byte[] ksrc = cc.doFinal(Base64.decode(data));
-//                return new String(ksrc);
-//            } else {
-//                System.err.println("2 EROARE private key probably DER not PEM. user openssl to convert: " + prvkey.toString());
-//                return null;
-//            }
-//        } catch (Exception var13) {
-//            String aux = "data - " + data + "<br/>env_key=" + env_key + "<br/>";
-//            System.err.println("2 EROARE unseal SMS : " + var13.getMessage() + aux);
-//            var13.printStackTrace();
-//            return null;
-//        }
-//    }
-//
-//    public Abstract factoryFromEncrypted(String _envKey, String _encData, String prvkey) throws Exception {
-//        String data = openssl_unseal(_encData, _envKey, prvkey);
-//        return Abstract.factory(data);
-//    }
-
-
-//    public String convertKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-//        Security.addProvider(new BouncyCastleProvider());
-//        URL url = new URL("http://45.86.220.233:3838/nertrans/files/setting/sandbox.Q3F5-2AE2-ESXJ-FLUJ-8WHKprivate.key");
-//        StringBuilder privateKey = new StringBuilder("");
-//        try {
-//            InputStreamReader isr = new InputStreamReader(url.openStream());
-//            BufferedReader brd = new BufferedReader(isr);
-//            List<String> lines = brd.lines().collect(Collectors.toList());
-//            for (String line : lines) {
-//                privateKey.append(line).append("\n");
-//            }
-//        } catch (IOException ex) {
-//            ex.printStackTrace();
-//        }
-//
-//        Reader reader = new StringReader(privateKey.toString());
-//        PemReader pemReader = new PemReader(reader);
-//        KeyFactory fact = KeyFactory.getInstance("RSA");
-//        PemObject pemObject = pemReader.readPemObject();
-//        byte[] keyContentAsBytesFromBC = pemObject.getContent();
-//        X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(keyContentAsBytesFromBC);
-//        PublicKey publicKey = fact.generatePublic(pubKeySpec);
-//        System.out.println(publicKey);
-//        return null;
-//
-////        // My private key DER file.
-////        byte[] privateKeyDerBytes = Files.readAllBytes(Path.of("src/main/resources/sandbox.Q3F5-2AE2-ESXJ-FLUJ-8WHKprivate.key"));
-////        // Convert the DER file to a Java PrivateKey
-////        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(privateKeyDerBytes);
-////        KeyFactory factory = KeyFactory.getInstance("RSA");
-////        PrivateKey pk = factory.generatePrivate(spec);
-////
-////        // Use PemWriter to write the key to PEM format
-////        StringWriter sw = new StringWriter();
-////        JcaPEMWriter writer = new JcaPEMWriter(new PrintWriter(System.out));
-////        writer.writeObject(sw);
-////        writer.close();
-////        try (PemWriter pw = new PemWriter(sw)) {
-////            PemObjectGenerator gen = new JcaMiscPEMGenerator(pk);
-////            pw.writeObject(gen);
-////        }
-////        return sw.toString();
-//    }
-//
-//    public  byte[] loadKeyFile() throws InvalidKeySpecException, NoSuchAlgorithmException {
-//        Security.addProvider(new BouncyCastleProvider());
-//
-//        File inFile = new File("src/main/resources/sandbox.Q3F5-2AE2-ESXJ-FLUJ-8WHKprivate.key");
-//        long fileLen = inFile.length();
-//        Reader reader = null;
-//        PemObject pemObject = null;
-//        try {
-//            reader = new FileReader(inFile);
-//
-//            char[] content = new char[(int) fileLen];
-//            reader.read(content);
-//            String str = new String(content);
-//
-//            StringReader stringreader = new StringReader(str);
-//            PemReader pem = new PemReader(stringreader);
-//            pemObject = pem.readPemObject();
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        byte[] keyContentAsBytesFromBC = pemObject.getContent();
-//        X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(keyContentAsBytesFromBC);
-//        KeyFactory fact = KeyFactory.getInstance("RSA");
-//        System.out.println(pubKeySpec.getFormat());
-//        PublicKey publicKey = fact.generatePublic(pubKeySpec);
-//        System.out.println(publicKey);
-//        return pemObject.getContent();
-//    }
-//
-//    public RSAPrivateKey readPrivateKey() throws Exception {
-//        URL url = new URL("http://45.86.220.233:3838/nertrans/files/setting/sandbox.Q3F5-2AE2-ESXJ-FLUJ-8WHKprivate.key");
-//
-//        StringBuilder privateKey = new StringBuilder("");
-//        try {
-//            InputStreamReader isr = new InputStreamReader(url.openStream());
-//            BufferedReader brd = new BufferedReader(isr);
-//            List<String> lines = brd.lines().collect(Collectors.toList());
-//            for (String line : lines) {
-//                privateKey.append(line).append("\n");
-//            }
-//        } catch (IOException ex) {
-//            ex.printStackTrace();
-//        }
-//
-//        String privateKeyPEM = privateKey.toString()
-//                .replace("-----BEGIN PRIVATE KEY-----", "")
-//                .replaceAll(System.lineSeparator(), "")
-//                .replace("-----END PRIVATE KEY-----", "");
-//
-//        byte[] encoded = Base64.decode(privateKeyPEM);
-//
-//        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-//        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
-//        System.out.println(keyFactory.generatePrivate(keySpec));
-//        return (RSAPrivateKey) keyFactory.generatePrivate(keySpec);
-//
-//
-
-
-
-//        try (FileReader keyReader = new FileReader("src/main/resources/sandbox.Q3F5-2AE2-ESXJ-FLUJ-8WHKprivate.key")) {
-//            PEMParser pemParser = new PEMParser(keyReader);
-//            JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
-//            PrivateKeyInfo privateKeyInfo = PrivateKeyInfo.getInstance(pemParser.readObject());
-//
-//            return (RSAPrivateKey) converter.getPrivateKey(privateKeyInfo);
-//        }
-//
-//
-
-
-//        KeyFactory factory = KeyFactory.getInstance("RSA");
-//
-//        try (FileReader keyReader = new FileReader("src/main/resources/sandbox.Q3F5-2AE2-ESXJ-FLUJ-8WHKprivate.key");
-//             PemReader pemReader = new PemReader(keyReader)) {
-//
-//            PemObject pemObject = pemReader.readPemObject();
-//            byte[] content = pemObject.getContent();
-//            PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(content);
-//            System.out.println(factory.generatePrivate(privKeySpec).toString());
-//            return (RSAPrivateKey) factory.generatePrivate(privKeySpec);
-//        }
-//    }
 }
 

@@ -60,7 +60,7 @@ public class PartnerSearchService {
             dynamicQuery.addCriteria(partnerNameCriteria);
         }
         if (partnerSearchDTO.getCUI() != null) {
-            Criteria partnerRegistrationCodeCriteria = Criteria.where("CUI").is(partnerSearchDTO.getCUI());
+            Criteria partnerRegistrationCodeCriteria = Criteria.where("CUI").regex(partnerSearchDTO.getCUI(), "i");
             dynamicQuery.addCriteria(partnerRegistrationCodeCriteria);
         }
         if (partnerSearchDTO.getAddress() != null) {
