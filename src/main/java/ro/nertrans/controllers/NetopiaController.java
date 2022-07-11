@@ -41,7 +41,7 @@ public class NetopiaController {
     public Object cardConfirm(@RequestParam(value = "env_key") String env_key,
                               @RequestParam(value = "data") String data) {
         try {
-            netopiaService.cardConfirm(env_key, data);
+            return netopiaService.cardConfirm(env_key, data);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (Exception e) {

@@ -46,6 +46,11 @@ public class PaymentDocumentController {
         } else
             return new ResponseEntity<>(new StringSuccessJSON(false, response), HttpStatus.BAD_REQUEST);
     }
+    @RequestMapping(value = "/changePaymentDocumentStatusByOrderId", method = RequestMethod.PUT)
+    @ApiResponse(description = "Changes status for a payment document by order id")
+    public void changePaymentDocumentStatusByOrderId(@RequestParam(value = "orderId") String orderId) {
+      paymentDocumentService.changePaymentDocumentStatus(orderId);
+    }
 
     @RequestMapping(value = "/updatePaymentDocument", method = RequestMethod.PUT)
     @ApiResponse(description = "Updates a payment document")
@@ -100,5 +105,7 @@ public class PaymentDocumentController {
             return new ResponseEntity<>(new StringSuccessJSON(true, response), HttpStatus.OK);
         } else return new ResponseEntity<>(new StringSuccessJSON(false, response), HttpStatus.BAD_REQUEST);
     }
+
+
 
 }

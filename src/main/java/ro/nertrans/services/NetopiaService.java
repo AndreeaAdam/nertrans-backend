@@ -82,6 +82,7 @@ public class NetopiaService {
         NetopiaResponseDTO responseDTO = new NetopiaResponseDTO();
         responseDTO.setKey(listItem.key);
         responseDTO.setVal(listItem.getVal());
+        System.out.println("key " + responseDTO.getKey());
         return responseDTO;
     }
 //    public void cardConfirm(HttpServletRequest req) throws Exception {
@@ -126,10 +127,9 @@ public class NetopiaService {
 //    }
 
     //    }
-    public void cardConfirm(String env_key, String data) throws Exception {
+    public String cardConfirm(String env_key, String data) throws Exception {
         OpenSSL.extraInit();
         URL url = new URL(settingService.getSettings().get().getNetopiaPrivateKey().getFilePath());
-//        URL url = new URL("http://45.86.220.233:3838/nertrans/files/setting/sandbox.Q3F5-2AE2-ESXJ-FLUJ-8WHKprivatee.key");
         StringBuilder privateKey = new StringBuilder("");
         try {
             InputStreamReader isr = new InputStreamReader(url.openStream());
@@ -146,16 +146,16 @@ public class NetopiaService {
         HttpURLConnection con = (HttpURLConnection) confirmUrl.openConnection();
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "application/json");
-//        System.out.println( "convert "+ convertKey("http://45.86.220.233:3838/nertrans/files/setting/sandbox.Q3F5-2AE2-ESXJ-FLUJ-8WHKprivate.key"));
+        System.out.println("env_key " + env_key);
         if (con.getRequestMethod().equalsIgnoreCase("post")) {
-            if (env_key == null || env_key.isEmpty()) return;
-            if (data == null || data.isEmpty()) return;
+            if (env_key == null || env_key.isEmpty()) return null;
+            if (data == null || data.isEmpty()) return null;
             Abstract paymentRequest = Abstract.factoryFromEncrypted(env_key, data, privateKey.toString());
             String action = paymentRequest._objReqNotify._action;
             System.out.println("action " + action);
             errorMessage = paymentRequest._objReqNotify._crc;
             if (action.equalsIgnoreCase("confirmed")) {
-                System.out.println("confirmed");
+               return "confirmed";
             } else if (action.equalsIgnoreCase("confirmed_pending")) {
                 System.out.println("confirmed_pending");
             } else if (action.equalsIgnoreCase("paid_pending")) {
@@ -167,8 +167,11 @@ public class NetopiaService {
             } else if (action.equalsIgnoreCase("credit")) {
                 System.out.println("credit");
             }
-        }//end if is post
-        System.out.print("<crc>" + errorMessage + "</crc>");
+        }
+        //end if is post
+//        System.out.print("<crc>" + errorMessage + "</crc>");
+        else return "notPostMethod";
+        return errorMessage;
     }
 //
 //    public String openssl_unseal(String data, String env_key, String prvkey) {
