@@ -88,6 +88,8 @@ public class PaymentDocumentService {
         paymentDocument1.get().setPartnerId(paymentDocument.getPartnerId());
         paymentDocument1.get().setApplyTVA(paymentDocument.isApplyTVA());
         paymentDocument1.get().setLocalReferenceNumber(paymentDocument.getDocSeries() + " " + paymentDocument.getDocNumber());
+        paymentDocument1.get().setLicenseNumber(paymentDocument.getLicenseNumber());
+        paymentDocument1.get().setWarranty(paymentDocument.getWarranty());
         if (paymentDocument.getPartnerId() != null && partnerRepository.findById(paymentDocument.getPartnerId()).isPresent()){
             paymentDocument1.get().setPartnerName(partnerRepository.findById(paymentDocument.getPartnerId()).get().getName());
         }

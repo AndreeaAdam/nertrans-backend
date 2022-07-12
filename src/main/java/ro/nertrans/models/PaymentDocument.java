@@ -71,4 +71,11 @@ public class PaymentDocument {
 
     @Field("billableProductName")
     private String billableProductName;
+
+    @Field("licenseNumber")
+    private String licenseNumber;
+
+    @Field("warranty")
+    private String warranty;
+
 }
