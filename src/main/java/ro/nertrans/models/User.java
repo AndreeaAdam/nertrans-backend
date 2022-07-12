@@ -22,6 +22,9 @@ public class User {
     @Id
     private String id;
 
+    @Field("numberUser")
+    private String numberUser;
+
     @Field("firstName")
     private String firstName;
 

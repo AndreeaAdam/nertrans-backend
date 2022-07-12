@@ -20,6 +20,9 @@ public class Partner {
     @Id
     private String id;
 
+    @Field("numberPartner")
+    private String numberPartner;
+
     @Field("CUI")
     private String CUI;
 

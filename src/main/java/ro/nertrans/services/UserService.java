@@ -16,6 +16,7 @@ import ro.nertrans.models.RegActivationCode;
 import ro.nertrans.models.User;
 import ro.nertrans.repositories.RegActivationCodeRepository;
 import ro.nertrans.repositories.UserRepository;
+import ro.nertrans.utils.NumberCounterService;
 import ro.nertrans.utils.RandomCodeService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,6 +38,10 @@ public class UserService implements UserDetailsService {
     private RandomCodeService randomCodeService;
     @Autowired
     private MailService mailService;
+
+    @Autowired
+    private NumberCounterService numberUserService;
+
     @Value("${apiUrl}")
     private String apiUrl;
     @Value("${apiUrlPort}")
@@ -51,6 +56,7 @@ public class UserService implements UserDetailsService {
         if (!adminExists) {
             User user = new User();
             user.setId("1");
+            user.setNumberUser(Long.toString(numberUserService.getNextUser()));
             user.setEmail("admin@admin.ro");
             user.setFirstName("Admin");
             user.setLastName("Admin");
@@ -83,6 +89,7 @@ public class UserService implements UserDetailsService {
         }
         User user1 = new User();
         user1.setId(null);
+        user1.setNumberUser(Long.toString(numberUserService.getNextUser()));
         user1.setActive(false);
         user1.setEmail(user.getEmail());
         user1.setFirstName(user.getFirstName());
