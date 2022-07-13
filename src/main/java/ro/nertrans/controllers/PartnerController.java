@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ro.nertrans.JSON.StringSuccessJSON;
-import ro.nertrans.dtos.PartnerDTO;
 import ro.nertrans.models.Partner;
 import ro.nertrans.services.PartnerService;
 
@@ -27,7 +26,7 @@ public class PartnerController {
      */
     @RequestMapping(value = "/addPartner", method = RequestMethod.POST)
     @ApiResponse(description = "Creates a new partner")
-    public ResponseEntity<?> addPartner(@RequestBody PartnerDTO partner,
+    public ResponseEntity<?> addPartner(@RequestBody Partner partner,
                                      HttpServletRequest request) {
         String response = partnerService.addPartner(partner, request);
         if (response.equals(partner.getId())) {

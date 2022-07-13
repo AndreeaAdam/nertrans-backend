@@ -2,7 +2,6 @@ package ro.nertrans.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ro.nertrans.dtos.PartnerDTO;
 import ro.nertrans.models.Partner;
 import ro.nertrans.models.PaymentDocument;
 import ro.nertrans.models.User;
@@ -35,7 +34,7 @@ public class PartnerService {
      * @param request - used to find the current user
      * @return String
      */
-    public String addPartner(PartnerDTO partner, HttpServletRequest request) {
+    public String addPartner(Partner partner, HttpServletRequest request) {
         if (userService.getCurrentUser(request).isEmpty()){
             return "youAreNotLoggedIn";
         }
@@ -43,13 +42,12 @@ public class PartnerService {
             return "CUIMustBeUnique";
         }
         Optional<User> currentUser = userService.getCurrentUser(request);
-        Partner partner1 = new Partner();
-        partner1.setId(null);
-        partner1.setNumberPartner(Long.toString(numberCounterService.getNextPartner()));
-        partner1.setDate(LocalDateTime.now());
-        partner1.setUserId(currentUser.get().getId());
-        partnerRepository.save(partner1);
-        return partner1.getId();
+        partner.setId(null);
+        partner.setNumberPartner(Long.toString(numberCounterService.getNextPartner()));
+        partner.setDate(LocalDateTime.now());
+        partner.setUserId(currentUser.get().getId());
+        partnerRepository.save(partner);
+        return partner.getId();
     }
 
     /**
