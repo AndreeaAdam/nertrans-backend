@@ -1,7 +1,9 @@
-package ro.nertrans.utils;
+package ro.nertrans.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ro.nertrans.repositories.NumberCounterRepository;
+import ro.nertrans.utils.NumberCounter;
 
 import java.util.Optional;
 

@@ -16,7 +16,6 @@ import ro.nertrans.models.RegActivationCode;
 import ro.nertrans.models.User;
 import ro.nertrans.repositories.RegActivationCodeRepository;
 import ro.nertrans.repositories.UserRepository;
-import ro.nertrans.utils.NumberCounterService;
 import ro.nertrans.utils.RandomCodeService;
 
 import javax.servlet.http.HttpServletRequest;

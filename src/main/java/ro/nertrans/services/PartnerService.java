@@ -7,7 +7,6 @@ import ro.nertrans.models.PaymentDocument;
 import ro.nertrans.models.User;
 import ro.nertrans.repositories.PartnerRepository;
 import ro.nertrans.repositories.PaymentDocumentRepository;
-import ro.nertrans.utils.NumberCounterService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
