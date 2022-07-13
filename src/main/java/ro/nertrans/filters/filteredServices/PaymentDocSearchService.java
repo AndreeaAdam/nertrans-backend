@@ -79,8 +79,8 @@ public class PaymentDocSearchService {
             Criteria paymentMethodCriteria = Criteria.where("paymentMethod").is(paymentDocumentSearchDTO.getPaymentMethod());
             dynamicQuery.addCriteria(paymentMethodCriteria);
         }
-        if (paymentDocumentSearchDTO.getPartnerId() != null) {
-            Criteria partnerIdCriteria = Criteria.where("partnerId").is(paymentDocumentSearchDTO.getPartnerId());
+        if (paymentDocumentSearchDTO.getPartnerName() != null) {
+            Criteria partnerIdCriteria = Criteria.where("partnerName").regex(paymentDocumentSearchDTO.getPartnerName(), "i");
             dynamicQuery.addCriteria(partnerIdCriteria);
         }
         if (paymentDocumentSearchDTO.getStatus() != null) {

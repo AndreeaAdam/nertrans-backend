@@ -12,7 +12,7 @@ public class PaymentDocumentSearchDTO {
     private String currency;
     private String paymentMethod;
     private String userId;
-    private String partnerId;
+    private String partnerName;
     private String status;
     private String docSeries;
 
