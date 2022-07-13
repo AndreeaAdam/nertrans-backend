@@ -22,7 +22,10 @@ public class NumberCounterService {
 
         return single_instance;
     }
-
+    /***
+     * @Description Increments by 1 the User number
+     * @return long
+     */
     public long getNextUser() {
 
         long number;
@@ -39,6 +42,10 @@ public class NumberCounterService {
         return number;
     }
 
+    /***
+     * @Description Increments by 1 the Partner number
+     * @return long
+     */
     public long getNextPartner() {
 
         long number;
