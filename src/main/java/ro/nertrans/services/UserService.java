@@ -83,14 +83,14 @@ public class UserService implements UserDetailsService {
         if (!currentUser.get().getRoles().contains(UserRoleEnum.ROLE_super_admin)){
             return "notAllowed";
         }
-        if (userRepository.getByEmail(user.getEmail()).isPresent()) {
+        if (userRepository.getByEmail(user.getEmail().toLowerCase()).isPresent()) {
             return "emailExists";
         }
         User user1 = new User();
         user1.setId(null);
         user1.setNumberUser(Long.toString(numberUserService.getNextUser()));
         user1.setActive(false);
-        user1.setEmail(user.getEmail());
+        user1.setEmail(user.getEmail().toLowerCase());
         user1.setFirstName(user.getFirstName());
         user1.setLastName(user.getLastName());
         user1.setAddress(user.getAddress());
