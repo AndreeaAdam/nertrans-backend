@@ -31,8 +31,6 @@ public class Partner {
     private String address;
 
     @Field("email")
-    @Getter(value= AccessLevel.NONE)
-    @Setter(value=AccessLevel.NONE)
     private String email;
 
     @Field("telephone")
@@ -53,11 +51,4 @@ public class Partner {
     @Field("VATPayer")
     private boolean VATPayer;
 
-    public String getEmail() {
-        return email.toLowerCase();
-    }
-
-    public void setEmail(String email) {
-        this.email = email.toLowerCase();
-    }
 }

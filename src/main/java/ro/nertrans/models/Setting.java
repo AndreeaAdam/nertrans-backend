@@ -20,8 +20,6 @@ public class Setting {
     private String id;
 
     @Field("smartBillEmail")
-    @Getter(value= AccessLevel.NONE)
-    @Setter(value=AccessLevel.NONE)
     private String smartBillEmail;
 
     @Field("smartBillToken")
@@ -51,11 +49,4 @@ public class Setting {
     @Field("netopiaPublicKey")
     private FileDTO netopiaPublicKey;
 
-    public String getSmartBillEmail() {
-        return smartBillEmail.toLowerCase();
-    }
-
-    public void setSmartBillEmail(String smartBillEmail) {
-        this.smartBillEmail = smartBillEmail.toLowerCase();
-    }
 }
