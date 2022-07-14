@@ -154,7 +154,6 @@ public class NetopiaService {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-        String errorMessage = "";
         URL confirmUrl = new URL(apiUrl + "/cardConfirm?" + "env_key=" + env_key + "&data=" + data);
         HttpURLConnection con = (HttpURLConnection) confirmUrl.openConnection();
         con.setRequestMethod("POST");
@@ -165,27 +164,19 @@ public class NetopiaService {
             Abstract paymentRequest = Abstract.factoryFromEncrypted(env_key, data, privateKey.toString());
             String action = paymentRequest._objReqNotify._action;
             String orderId = paymentRequest._orderId;
-            System.out.println( "order id " + paymentRequest._orderId);
-            errorMessage = paymentRequest._objReqNotify._crc;
             Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findAll().stream().filter(paymentDocument1 -> (paymentDocument1.getDocSeries() + paymentDocument1.getDocNumber()).equalsIgnoreCase(orderId)).findFirst();
             if (action.equalsIgnoreCase("confirmed")) {
-                System.out.println("confirmed");
-                paymentDocument.get().setStatus("Confirmed");
+                paymentDocument.get().setStatus("Plătită");
             } else if (action.equalsIgnoreCase("confirmed_pending")) {
                 paymentDocument.get().setStatus("Confirmed pending");
-                System.out.println("confirmed_pending");
             } else if (action.equalsIgnoreCase("paid_pending")) {
                 paymentDocument.get().setStatus("Paid pending");
-                System.out.println("paid_pending");
             } else if (action.equalsIgnoreCase("paid")) {
                 paymentDocument.get().setStatus("Paid");
-                System.out.println("paid");
             } else if (action.equalsIgnoreCase("canceled")) {
                 paymentDocument.get().setStatus("Canceled");
-                System.out.println("canceled");
             } else if (action.equalsIgnoreCase("credit")) {
                 paymentDocument.get().setStatus("Credit");
-                System.out.println("credit");
             }
             paymentDocumentRepository.save(paymentDocument.get());
         }

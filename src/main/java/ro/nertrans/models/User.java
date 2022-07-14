@@ -40,6 +40,9 @@ public class User {
     @Field("active")
     private boolean active;
 
+    @Field("actLikeAdmin")
+    private boolean actLikeAdmin;
+
     @Field("telephone")
     private String telephone;
 

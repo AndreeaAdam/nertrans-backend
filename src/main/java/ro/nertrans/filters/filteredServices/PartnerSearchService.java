@@ -72,7 +72,7 @@ public class PartnerSearchService {
             dynamicQuery.addCriteria(partnerUserIdCriteria);
         }
         if (partnerSearchDTO.getEmail() != null) {
-            Criteria partnerEmailCriteria = Criteria.where("email").is(partnerSearchDTO.getEmail());
+            Criteria partnerEmailCriteria = Criteria.where("email").regex(partnerSearchDTO.getEmail(), "i");
             dynamicQuery.addCriteria(partnerEmailCriteria);
         }
         dynamicQuery.collation(Collation.of("en").

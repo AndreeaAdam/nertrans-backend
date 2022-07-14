@@ -15,5 +15,8 @@ public class PaymentDocumentSearchDTO {
     private String partnerName;
     private String status;
     private String docSeries;
+    private String localReferenceNumber;
+    private String startDate;
+    private String endDate;
 
 }

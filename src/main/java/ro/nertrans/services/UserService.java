@@ -60,6 +60,7 @@ public class UserService implements UserDetailsService {
             user.setFirstName("Admin");
             user.setLastName("Admin");
             user.setActive(true);
+            user.setActLikeAdmin(true);
             user.setRegistrationDate(LocalDateTime.now());
             ArrayList<UserRoleEnum> roles = new ArrayList<>();
             roles.add(UserRoleEnum.ROLE_super_admin);
@@ -96,6 +97,7 @@ public class UserService implements UserDetailsService {
         user1.setAddress(user.getAddress());
         user1.setTelephone(user.getTelephone());
         user1.setEmployeeCode(user.getEmployeeCode());
+        user1.setActLikeAdmin(user.isActLikeAdmin());
         user1.setOffice(user.getOffice());
         user1.setRegistrationDate(LocalDateTime.now());
         user1.setName(user.getFirstName() + " " + user.getLastName());
@@ -219,6 +221,7 @@ public class UserService implements UserDetailsService {
         targetUser.get().setEmployeeCode(user.getEmployeeCode());
         targetUser.get().setLastName(user.getLastName());
         targetUser.get().setFirstName(user.getFirstName());
+        targetUser.get().setActLikeAdmin(user.isActLikeAdmin());
         targetUser.get().setName(user.getFirstName() + " " + user.getLastName());
         userRepository.save(targetUser.get());
         return "success";

@@ -20,6 +20,7 @@ import ro.nertrans.services.UserService;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,14 +55,14 @@ public class PaymentDocSearchService {
         }
         Optional<User> user = userService.getCurrentUser(request);
         Criteria docSeriesCriteria;
-        if (!user.get().getRoles().contains(UserRoleEnum.ROLE_super_admin)) {
-            docSeriesCriteria = Criteria.where("docSeries").is(user.get().getOffice());
-            dynamicQuery.addCriteria(docSeriesCriteria);
-        } else {
+        if (user.get().getRoles().contains(UserRoleEnum.ROLE_super_admin) || user.get().isActLikeAdmin()) {
             if (paymentDocumentSearchDTO.getDocSeries() != null) {
                 docSeriesCriteria = Criteria.where("docSeries").is(paymentDocumentSearchDTO.getDocSeries());
                 dynamicQuery.addCriteria(docSeriesCriteria);
             }
+        } else {
+            docSeriesCriteria = Criteria.where("docSeries").is(user.get().getOffice());
+            dynamicQuery.addCriteria(docSeriesCriteria);
         }
         if (paymentDocumentSearchDTO.getName() != null) {
             Criteria paymentDocNameCriteria = Criteria.where("name").regex(paymentDocumentSearchDTO.getName(), "i");
@@ -80,13 +81,22 @@ public class PaymentDocSearchService {
             dynamicQuery.addCriteria(paymentMethodCriteria);
         }
         if (paymentDocumentSearchDTO.getPartnerName() != null) {
-            Criteria partnerIdCriteria = Criteria.where("partnerName").regex(paymentDocumentSearchDTO.getPartnerName(), "i");
-            dynamicQuery.addCriteria(partnerIdCriteria);
+            Criteria partnerNameCriteria = Criteria.where("partnerName").regex(paymentDocumentSearchDTO.getPartnerName(), "i");
+            dynamicQuery.addCriteria(partnerNameCriteria);
+        }
+        if (paymentDocumentSearchDTO.getLocalReferenceNumber() != null) {
+            Criteria LRNCriteria = Criteria.where("localReferenceNumber").regex(paymentDocumentSearchDTO.getLocalReferenceNumber(), "i");
+            dynamicQuery.addCriteria(LRNCriteria);
         }
         if (paymentDocumentSearchDTO.getStatus() != null) {
             Criteria statusCriteria = Criteria.where("status").is(paymentDocumentSearchDTO.getStatus());
             dynamicQuery.addCriteria(statusCriteria);
         }
+        if (paymentDocumentSearchDTO.getStartDate() != null && paymentDocumentSearchDTO.getEndDate() != null) {
+            Criteria dateRangeCriteria = Criteria.where("date").gte(LocalDate.parse(paymentDocumentSearchDTO.getStartDate()).atStartOfDay().minusDays(1)).lte(LocalDate.parse(paymentDocumentSearchDTO.getEndDate()).atTime(23,59).plusDays(1));
+            dynamicQuery.addCriteria(dateRangeCriteria);
+        }
+
         dynamicQuery.collation(Collation.of("en").
                 strength(Collation.ComparisonLevel.secondary()));
         List<PaymentDocument> list = mongoTemplate.find(dynamicQuery, PaymentDocument.class);

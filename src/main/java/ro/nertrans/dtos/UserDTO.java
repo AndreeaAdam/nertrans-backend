@@ -16,4 +16,6 @@ public class UserDTO {
     private String address;
     private String employeeCode;
     private String office;
+    private boolean actLikeAdmin;
+
 }
