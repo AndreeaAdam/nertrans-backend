@@ -143,7 +143,7 @@ public class UserService implements UserDetailsService {
      */
     public void createCode(String userEmail, String userId, String registrationCode) {
         RegActivationCode code = new RegActivationCode();
-        code.setEmail(userEmail);
+        code.setEmail(userEmail.toLowerCase());
         code.setUserId(userId);
         code.setRegistrationCode(registrationCode);
         code.setCreationDate(LocalDateTime.now());
