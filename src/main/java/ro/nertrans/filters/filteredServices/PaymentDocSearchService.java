@@ -93,7 +93,7 @@ public class PaymentDocSearchService {
             dynamicQuery.addCriteria(statusCriteria);
         }
         if (paymentDocumentSearchDTO.getStartDate() != null && paymentDocumentSearchDTO.getEndDate() != null) {
-            Criteria dateRangeCriteria = Criteria.where("date").gte(LocalDate.parse(paymentDocumentSearchDTO.getStartDate()).atStartOfDay().minusDays(1)).lte(LocalDate.parse(paymentDocumentSearchDTO.getEndDate()).atTime(23,59).plusDays(1));
+            Criteria dateRangeCriteria = Criteria.where("date").gte(LocalDate.parse(paymentDocumentSearchDTO.getStartDate()).atStartOfDay()).lte(LocalDate.parse(paymentDocumentSearchDTO.getEndDate()).atTime(23,59));
             dynamicQuery.addCriteria(dateRangeCriteria);
         }
 
