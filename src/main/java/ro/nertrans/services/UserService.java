@@ -83,14 +83,14 @@ public class UserService implements UserDetailsService {
         if (!currentUser.get().getRoles().contains(UserRoleEnum.ROLE_super_admin)){
             return "notAllowed";
         }
-        if (userRepository.getByEmail(user.getEmail().toLowerCase()).isPresent()) {
+        if (userRepository.getByEmail(user.getEmail()).isPresent()) {
             return "emailExists";
         }
         User user1 = new User();
         user1.setId(null);
         user1.setNumberUser(Long.toString(numberUserService.getNextUser()));
         user1.setActive(false);
-        user1.setEmail(user.getEmail().toLowerCase());
+        user1.setEmail(user.getEmail());
         user1.setFirstName(user.getFirstName());
         user1.setLastName(user.getLastName());
         user1.setAddress(user.getAddress());
@@ -143,7 +143,7 @@ public class UserService implements UserDetailsService {
      */
     public void createCode(String userEmail, String userId, String registrationCode) {
         RegActivationCode code = new RegActivationCode();
-        code.setEmail(userEmail.toLowerCase());
+        code.setEmail(userEmail);
         code.setUserId(userId);
         code.setRegistrationCode(registrationCode);
         code.setCreationDate(LocalDateTime.now());

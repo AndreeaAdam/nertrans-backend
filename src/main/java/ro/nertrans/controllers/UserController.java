@@ -63,9 +63,8 @@ public class UserController {
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ApiResponse(description = "Logs in a user ")
     public ResponseEntity<?> login(@RequestBody UserLoginDTO userLogin, HttpServletRequest request) {
-        String loginEmail = userLogin.getEmail().toLowerCase();
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(loginEmail, userLogin.getPassword());
-        if (userRepository.getByEmail(loginEmail).isEmpty()) {
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userLogin.getEmail(), userLogin.getPassword());
+        if (userRepository.getByEmail(userLogin.getEmail()).isEmpty()) {
             return new ResponseEntity<>(new StringSuccessJSON(false, "invalidEmail"), HttpStatus.BAD_REQUEST);
         }
         User currentUser = userRepository.getByEmailIgnoreCase(userLogin.getEmail());

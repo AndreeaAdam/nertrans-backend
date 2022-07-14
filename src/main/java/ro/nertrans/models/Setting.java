@@ -1,8 +1,6 @@
 package ro.nertrans.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -22,6 +20,8 @@ public class Setting {
     private String id;
 
     @Field("smartBillEmail")
+    @Getter(value= AccessLevel.NONE)
+    @Setter(value=AccessLevel.NONE)
     private String smartBillEmail;
 
     @Field("smartBillToken")
@@ -50,4 +50,12 @@ public class Setting {
 
     @Field("netopiaPublicKey")
     private FileDTO netopiaPublicKey;
+
+    public String getSmartBillEmail() {
+        return smartBillEmail.toLowerCase();
+    }
+
+    public void setSmartBillEmail(String smartBillEmail) {
+        this.smartBillEmail = smartBillEmail.toLowerCase();
+    }
 }

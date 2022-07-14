@@ -1,8 +1,6 @@
 package ro.nertrans.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -33,6 +31,8 @@ public class Partner {
     private String address;
 
     @Field("email")
+    @Getter(value= AccessLevel.NONE)
+    @Setter(value=AccessLevel.NONE)
     private String email;
 
     @Field("telephone")
@@ -52,4 +52,12 @@ public class Partner {
 
     @Field("VATPayer")
     private boolean VATPayer;
+
+    public String getEmail() {
+        return email.toLowerCase();
+    }
+
+    public void setEmail(String email) {
+        this.email = email.toLowerCase();
+    }
 }
