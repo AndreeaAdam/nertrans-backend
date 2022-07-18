@@ -140,10 +140,6 @@ public class NetopiaService {
 
     //    }
     public void cardConfirm(String env_key, String data) throws Exception {
-        int errorCode = 0;
-        String errorMessage = "";
-        int errorType = ro.mobilPay.payment.request.Abstract.CONFIRM_ERROR_TYPE_NONE;
-        System.out.println("////////////////////////////////////////////////////////");
         OpenSSL.extraInit();
         URL url = new URL(settingService.getSettings().get().getNetopiaPrivateKey().getFilePath());
         StringBuilder privateKey = new StringBuilder("");
@@ -167,13 +163,6 @@ public class NetopiaService {
             Abstract paymentRequest = Abstract.factoryFromEncrypted(env_key, data, privateKey.toString());
             String action = paymentRequest._objReqNotify._action;
             String orderId = paymentRequest._orderId;
-            errorMessage = paymentRequest._objReqNotify._errorMessage;
-            String errorMessage2 = paymentRequest._objReqNotify._crc;
-            errorCode = paymentRequest._objReqNotify._errorCode;
-            System.out.println("/////////////////////////////////////////////////////"+errorMessage2);
-            System.out.println(errorMessage);
-            System.out.println(errorCode);
-            System.out.println(errorType);
             Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findAll().stream().filter(paymentDocument1 -> (paymentDocument1.getDocSeries() + paymentDocument1.getDocNumber()).equalsIgnoreCase(orderId)).findFirst();
             if (action.equalsIgnoreCase("confirmed")) {
                 paymentDocument.get().setStatus("Plătită");
@@ -188,10 +177,6 @@ public class NetopiaService {
             } else if (action.equalsIgnoreCase("credit")) {
                 paymentDocument.get().setStatus("Credit");
             }
-            System.out.println("/////////////////////////////////////////////////////"+errorMessage2);
-            System.out.println(errorMessage);
-            System.out.println(errorCode);
-            System.out.println(errorType);
             paymentDocumentRepository.save(paymentDocument.get());
         }
     }
