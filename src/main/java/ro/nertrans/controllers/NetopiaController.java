@@ -35,6 +35,7 @@ public class NetopiaController {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        System.out.println("TEST////////////////////////////////////");
         return null;
     }
 }

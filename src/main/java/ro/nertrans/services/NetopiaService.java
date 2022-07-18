@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import ro.mobilPay.payment.Invoice;
 import ro.mobilPay.payment.request.Abstract;
 import ro.mobilPay.payment.request.Card;
-import ro.mobilPay.util.FileHelper;
 import ro.mobilPay.util.ListItem;
 import ro.mobilPay.util.OpenSSL;
 import ro.nertrans.dtos.MobilPayDTO;
@@ -144,6 +143,7 @@ public class NetopiaService {
         int errorCode = 0;
         String errorMessage = "";
         int errorType = ro.mobilPay.payment.request.Abstract.CONFIRM_ERROR_TYPE_NONE;
+        System.out.println("////////////////////////////////////////////////////////");
         OpenSSL.extraInit();
         URL url = new URL(settingService.getSettings().get().getNetopiaPrivateKey().getFilePath());
         StringBuilder privateKey = new StringBuilder("");
