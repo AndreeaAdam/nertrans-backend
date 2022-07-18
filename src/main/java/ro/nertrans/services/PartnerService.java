@@ -1,7 +1,12 @@
 package ro.nertrans.services;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import ro.nertrans.models.Partner;
 import ro.nertrans.models.PaymentDocument;
 import ro.nertrans.models.User;
@@ -9,9 +14,12 @@ import ro.nertrans.repositories.PartnerRepository;
 import ro.nertrans.repositories.PaymentDocumentRepository;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -122,5 +130,71 @@ public class PartnerService {
             }
         }
         return partners;
+    }
+
+    public boolean importPartners(MultipartFile reapExcelDataFile, HttpServletRequest request) throws IOException {
+        //Optional<Partner> currentPartner = getCurrentPartner(request);
+        XSSFWorkbook workbook = new XSSFWorkbook(reapExcelDataFile.getInputStream());
+        if (reapExcelDataFile.isEmpty() ||
+                !FilenameUtils.getExtension(Objects.requireNonNull(reapExcelDataFile.getOriginalFilename()).toLowerCase()).equals("xlsx")) {
+            return false;
+        }
+        XSSFSheet worksheet = workbook.getSheetAt(0);
+        int number = 0;
+        try {
+            for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
+                Partner partner = new Partner();
+                partner.setId(null);
+                partner.setNumberPartner(Long.toString(numberCounterService.getNextPartner()));
+                partner.setDate(LocalDateTime.now());
+                //partner.setUserId(null);
+
+                XSSFRow row = worksheet.getRow(i);
+                int cell = 0;
+
+                if (row.getCell(cell) != null) {
+                    partner.setName(row.getCell(cell++).toString());;
+                }
+                //TODO:CIF
+
+                int CUICell = 0;
+                if (row.getCell(cell) != null) {
+                    if (partnerRepository.getByCUIIgnoreCase(partner.getCUI()) == null) {
+                        partner.setCUI(row.getCell(cell++).toString());
+                    }
+                    CUICell = cell;
+                }
+                if (row.getCell(cell) != null) {
+                    partner.setUserId(row.getCell(cell++).toString());
+                }
+                if (row.getCell(cell) != null) {
+                    partner.setAddress(row.getCell(cell++).toString());
+                }
+                if (row.getCell(cell) != null) {
+                    partner.setCity(row.getCell(cell++).toString());
+                }
+                //TODO:judet
+                //TODO:banca
+                //TODO:iban
+
+                if (row.getCell(cell) != null) {
+                    partner.setCountry(row.getCell(cell++).toString());
+                }
+                if (row.getCell(cell) != null) {
+                    partner.setEmail(row.getCell(cell++).toString());
+                }
+                //TODO:pers contact
+
+                if (row.getCell(cell) != null) {
+                    partner.setTelephone(row.getCell(cell++).toString());
+                }
+                if (partnerRepository.getByCUIIgnoreCase(row.getCell(CUICell).toString()) == null) {
+                    partnerRepository.save(partner);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return true;
     }
 }
