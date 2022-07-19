@@ -88,7 +88,7 @@ public class UserController {
     public ModelAndView activateUser(@RequestParam(value = "registrationCode") String registrationCode) {
         boolean success = userService.activateUser(registrationCode);
         if (success) {
-            return new ModelAndView("redirect:" + apiUrl + "/auth/login");
+            return new ModelAndView("redirect:" + apiUrl + "/autentificare");
         } else {
             return new ModelAndView("redirect:" + apiUrl + "/activare-cont");
         }
