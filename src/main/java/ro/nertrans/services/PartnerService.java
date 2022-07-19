@@ -155,15 +155,18 @@ public class PartnerService {
                 } else {
                     partner.setName(row.getCell(cell++).toString());
                 }
-                //TODO:CIF
-
+                if (row.getCell(cell) != null) {
+                    partner.setCIF(row.getCell(cell++).toString());
+                } else {
+                    partner.setCIF(row.getCell(cell++).toString());
+                }
                 int CUICell = 0;
                 if (row.getCell(cell) != null) {
-                    if (partnerRepository.getByCUIIgnoreCase(row.getCell(cell).toString()) == null) {
-                        partner.setCUI(row.getCell(cell++).toString());
-                    }
-                    CUICell = cell;
-                } else {
+//                    if (partnerRepository.getByCUIIgnoreCase(row.getCell(cell).toString()) == null) {
+//                        partner.setCUI(row.getCell(cell++).toString());
+//                    }
+//                    CUICell = cell;
+//                } else {
                     partner.setCUI(row.getCell(cell++).toString());
                 }
                 if (row.getCell(cell) != null) {
@@ -181,10 +184,21 @@ public class PartnerService {
                 } else {
                     partner.setCity(row.getCell(cell++).toString());
                 }
-                //TODO:judet
-                //TODO:banca
-                //TODO:iban
-
+                if (row.getCell(cell) != null) {
+                    partner.setCounty(row.getCell(cell++).toString());
+                } else {
+                    partner.setCounty(row.getCell(cell++).toString());
+                }
+                if (row.getCell(cell) != null) {
+                    partner.setBank(row.getCell(cell++).toString());
+                } else {
+                    partner.setBank(row.getCell(cell++).toString());
+                }
+                if (row.getCell(cell) != null) {
+                    partner.setIban(row.getCell(cell++).toString());
+                } else {
+                    partner.setIban(row.getCell(cell++).toString());
+                }
                 if (row.getCell(cell) != null) {
                     partner.setCountry(row.getCell(cell++).toString());
                 } else {
@@ -195,8 +209,11 @@ public class PartnerService {
                 } else {
                     partner.setEmail(row.getCell(cell++).toString());
                 }
-                //TODO:pers contact
-
+                if (row.getCell(cell) != null) {
+                    partner.setContact(row.getCell(cell++).toString());
+                } else {
+                    partner.setContact(row.getCell(cell++).toString());
+                }
                 if (row.getCell(cell) != null) {
                     partner.setTelephone(row.getCell(cell++).toString());
                 } else {

@@ -47,9 +47,25 @@ public class Partner {
     @Field("country")
     private String country;
 
+    @Field("county")
+    private String county;
+
     @Field("city")
     private String city;
 
     @Field("VATPayer")
     private boolean VATPayer;
+
+    @Field("CIF")
+    private String CIF;
+
+    @Field("bank")
+    private String bank;
+
+    @Field("iban")
+    private String iban;
+
+    @Field("contact")
+    private String contact;
+
 }
