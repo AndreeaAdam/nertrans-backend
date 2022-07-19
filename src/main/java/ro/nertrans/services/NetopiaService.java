@@ -141,13 +141,13 @@ public class NetopiaService {
 //    }
 
     //    }
-    public void cardConfirm(String env_key, String data) throws Exception {
-        System.out.println("TEST///////////////////////////1///////////////////////////////TEST");
+    public String cardConfirm(String env_key, String data) throws Exception {
+        //System.out.println("TEST///////////////////////////1cardconfirm///////////////////////////////TEST");
+        OpenSSL.extraInit();
         int errorCode = 0;
         String errorMessage = "";
-        String errorMessage2 = "";
+        //String errorMessage2 = "";
         int errorType = ro.mobilPay.payment.request.Abstract.CONFIRM_ERROR_TYPE_NONE;
-        OpenSSL.extraInit();
         URL url = new URL(settingService.getSettings().get().getNetopiaPrivateKey().getFilePath());
         StringBuilder privateKey = new StringBuilder("");
         try {
@@ -157,6 +157,8 @@ public class NetopiaService {
             for (String line : lines) {
                 privateKey.append(line).append("\n");
             }
+            //System.out.println("TEST///////////////////////////2cardconfirm TRY///////////////////////////////TEST");
+            //System.out.println(errorType+" "+ errorCode +" "+ errorMessage);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -164,17 +166,19 @@ public class NetopiaService {
         HttpURLConnection con = (HttpURLConnection) confirmUrl.openConnection();
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "application/json");
+        //System.out.println("TEST///////////////////////////2cardconfirm beforeIF///////////////////////////////TEST");
+        //System.out.println(errorType+" "+ errorCode +" "+ errorMessage);
         if (con.getRequestMethod().equalsIgnoreCase("post")) {
-            if (env_key == null || env_key.isEmpty()) return ;
-            if (data == null || data.isEmpty()) return ;
+            if (env_key == null || env_key.isEmpty()) return "env key null";
+            if (data == null || data.isEmpty()) return "data null";
             Abstract paymentRequest = Abstract.factoryFromEncrypted(env_key, data, privateKey.toString());
             String action = paymentRequest._objReqNotify._action;
             String orderId = paymentRequest._orderId;
 
             errorCode = paymentRequest._objReqNotify._errorCode;
             errorMessage = paymentRequest._objReqNotify._crc;
-            errorMessage2 = paymentRequest._objReqNotify._errorMessage;
-            System.out.println(errorType+" "+ errorCode +" "+ errorMessage +" "+ errorMessage2);
+            //errorMessage2 = paymentRequest._objReqNotify._errorMessage;
+            //System.out.println(errorType+" "+ errorCode +" "+ errorMessage);
             Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findAll().stream().filter(paymentDocument1 -> (paymentDocument1.getDocSeries() + paymentDocument1.getDocNumber()).equalsIgnoreCase(orderId)).findFirst();
             if (action.equalsIgnoreCase("confirmed")) {
                 paymentDocument.get().setStatus("Plătită");
@@ -189,9 +193,17 @@ public class NetopiaService {
             } else if (action.equalsIgnoreCase("credit")) {
                 paymentDocument.get().setStatus("Credit");
             }
-            System.out.println("TEST///////////////////////////2///////////////////////////////TEST");
-            System.out.println(errorType+" "+ errorCode +" "+ errorMessage +" "+ errorMessage2);
             paymentDocumentRepository.save(paymentDocument.get());
+        }
+        //System.out.println("TEST///////////////////////////2cardconfirm IF///////////////////////////////TEST");
+        //System.out.println(errorType+" "+ errorCode +" "+ errorMessage);
+        if(errorCode == 0)
+        {
+            return "<crc>"+errorMessage+"</crc>";
+        }
+        else
+        {
+            return "<crc error_type=\""+errorType+"\" error_code=\""+errorCode+"\">"+errorMessage+"</crc>";
         }
     }
 }
