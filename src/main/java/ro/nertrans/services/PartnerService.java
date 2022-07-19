@@ -139,13 +139,14 @@ public class PartnerService {
             return false;
         }
         XSSFSheet worksheet = workbook.getSheetAt(0);
+        Optional<User> user = userService.getCurrentUser(request);
         try {
             for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
                 Partner partner = new Partner();
                 partner.setId(null);
                 partner.setNumberPartner(Long.toString(numberCounterService.getNextPartner()));
                 partner.setDate(LocalDateTime.now());
-                //partner.setUserId(null);
+                partner.setUserId(user.get().getId());
 
                 XSSFRow row = worksheet.getRow(i);
                 int cell = 0;
@@ -169,11 +170,11 @@ public class PartnerService {
 //                } else {
                     partner.setCUI(row.getCell(cell++).toString());
                 }
-                if (row.getCell(cell) != null) {
-                    partner.setUserId(row.getCell(cell++).toString());
-                } else {
-                    partner.setUserId(row.getCell(cell++).toString());
-                }
+//                if (row.getCell(cell) != null) {
+//                    partner.setUserId(row.getCell(cell++).toString());
+//                } else {
+//                    partner.setUserId(row.getCell(cell++).toString());
+//                }
                 if (row.getCell(cell) != null) {
                     partner.setAddress(row.getCell(cell++).toString());
                 } else {

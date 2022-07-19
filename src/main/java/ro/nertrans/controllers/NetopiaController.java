@@ -27,6 +27,7 @@ public class NetopiaController {
     @RequestMapping(value = "/cardConfirm", method = RequestMethod.POST)
     public Object cardConfirm(@RequestParam(value = "env_key") String env_key,
                               @RequestParam(value = "data") String data) {
+        System.out.println("TEST///11///////////////////////////////////////////////////////TEST");
         try {
              netopiaService.cardConfirm(env_key, data);
 //            return netopiaService.cardConfirm(env_key, data);
@@ -35,6 +36,7 @@ public class NetopiaController {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        System.out.println("TEST///22///////////////////////////////////////////////////////TEST");
         return null;
     }
 }
