@@ -38,6 +38,8 @@ public class NetopiaService {
         OpenSSL.extraInit();
         String signature = settingService.getSettings().get().getNetopiaSignature();
         URL url = new URL(settingService.getSettings().get().getNetopiaPublicKey().getFilePath());
+       // String signature = "Q3F5-2AE2-ESXJ-FLUJ-8WHK";
+        //URL url = new URL("https://nertrans.eu:3838/nertrans/files/setting/sandbox.Q3F5-2AE2-ESXJ-FLUJ-8WHK.public.cer");
         StringBuilder publicCer = new StringBuilder();
         try {
             InputStreamReader isr = new InputStreamReader(url.openStream());
