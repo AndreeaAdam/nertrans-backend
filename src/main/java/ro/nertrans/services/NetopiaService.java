@@ -57,7 +57,7 @@ public class NetopiaService {
 
         req._signature = signature;
         req._confirmUrl = apiUrl +"/nertrans/cardConfirm";
-        req._returnUrl = apiUrl +"/platit-cu-succes";
+        req._returnUrl = apiUrl +"/confirmare-comanda";
         req._orderId = dto.getOrderId();
         req._type = "card";
         Date date = new Date();
