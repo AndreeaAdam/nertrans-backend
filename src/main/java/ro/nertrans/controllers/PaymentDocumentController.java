@@ -87,7 +87,7 @@ public class PaymentDocumentController {
 
     @RequestMapping(value = "/getPaymentDocumentBySeriesAndNumber", method = RequestMethod.GET)
     @ApiResponse(description = "Returns a single doc by series and number")
-    public ResponseEntity<?> getPaymentDocumentBySeriesAndNumber(@RequestParam(value = "docSeries") String docSeries, @RequestParam(value = "docNumber") String docNumber) {
+    public ResponseEntity<?> getPaymentDocumentBySeriesAndNumber(@RequestParam(value = "docSeries") String docSeries, @RequestParam(value = "docNumber") Long docNumber) {
         return new ResponseEntity<>(paymentDocumentService.getPaymentDocumentBySeriesAndNumber(docSeries,docNumber), HttpStatus.OK);
     }
 

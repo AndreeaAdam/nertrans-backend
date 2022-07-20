@@ -105,7 +105,7 @@ public class PaymentDocumentService {
         return paymentDocumentRepository.findById(docId);
     }
 
-    public Optional<PaymentDocument> getPaymentDocumentBySeriesAndNumber(String docSeries, String docNumber) {
+    public Optional<PaymentDocument> getPaymentDocumentBySeriesAndNumber(String docSeries, Long docNumber) {
         return paymentDocumentRepository.findByDocSeriesAndDocNumber(docSeries,docNumber);
     }
 
