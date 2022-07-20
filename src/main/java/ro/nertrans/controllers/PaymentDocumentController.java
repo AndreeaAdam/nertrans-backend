@@ -85,6 +85,12 @@ public class PaymentDocumentController {
         return new ResponseEntity<>(paymentDocumentService.getPaymentDocumentById(docId), HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/getPaymentDocumentBySeriesAndNumber", method = RequestMethod.GET)
+    @ApiResponse(description = "Returns a single doc by series and number")
+    public ResponseEntity<?> getPaymentDocumentBySeriesAndNumber(@RequestParam(value = "docSeries") String docSeries, @RequestParam(value = "docNumber") String docNumber) {
+        return new ResponseEntity<>(paymentDocumentService.getPaymentDocumentBySeriesAndNumber(docSeries,docNumber), HttpStatus.OK);
+    }
+
     @RequestMapping(value = "/getMaxNumberByOffice", method = RequestMethod.GET)
     @ApiResponse(description = "Returns the maximum number for a payment document by office")
     public ResponseEntity<?> getMaxNumberByOffice(@RequestParam(value = "office") String office) {

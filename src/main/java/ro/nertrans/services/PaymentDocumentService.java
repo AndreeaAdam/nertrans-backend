@@ -105,6 +105,10 @@ public class PaymentDocumentService {
         return paymentDocumentRepository.findById(docId);
     }
 
+    public Optional<PaymentDocument> getPaymentDocumentBySeriesAndNumber(String docSeries, String docNumber) {
+        return paymentDocumentRepository.findByDocSeriesAndDocNumber(docSeries,docNumber);
+    }
+
     /**
      * @Description: Returns the maximum number for a payment document by office
      * @param office - the office
@@ -186,4 +190,6 @@ public class PaymentDocumentService {
             return "success";
         }else return "invalidId";
     }
+
+
 }
