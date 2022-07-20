@@ -183,15 +183,15 @@ public class NetopiaService {
             if (action.equalsIgnoreCase("confirmed")) {
                 paymentDocument.get().setStatus("Plătită");
             } else if (action.equalsIgnoreCase("confirmed_pending")) {
-                paymentDocument.get().setStatus("Confirmed pending");
+                paymentDocument.get().setStatus("Plată în verificare");
             } else if (action.equalsIgnoreCase("paid_pending")) {
-                paymentDocument.get().setStatus("Paid pending");
+                paymentDocument.get().setStatus("Plată în verificare");
             } else if (action.equalsIgnoreCase("paid")) {
-                paymentDocument.get().setStatus("Paid");
+                paymentDocument.get().setStatus("Plată în verificare");
             } else if (action.equalsIgnoreCase("canceled")) {
-                paymentDocument.get().setStatus("Canceled");
+                paymentDocument.get().setStatus("Plată respinsă");
             } else if (action.equalsIgnoreCase("credit")) {
-                paymentDocument.get().setStatus("Credit");
+                paymentDocument.get().setStatus("Plată returnată");
             }
             paymentDocumentRepository.save(paymentDocument.get());
         }
