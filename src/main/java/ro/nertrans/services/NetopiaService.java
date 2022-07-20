@@ -180,7 +180,9 @@ public class NetopiaService {
             //errorMessage2 = paymentRequest._objReqNotify._errorMessage;
             //System.out.println(errorType+" "+ errorCode +" "+ errorMessage);
             Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findAll().stream().filter(paymentDocument1 -> (paymentDocument1.getDocSeries() + paymentDocument1.getDocNumber()).equalsIgnoreCase(orderId)).findFirst();
-            if (action.equalsIgnoreCase("confirmed")) {
+            if(errorCode != 0) {
+                paymentDocument.get().setStatus("Plată respinsă");
+            } else if (action.equalsIgnoreCase("confirmed")) {
                 paymentDocument.get().setStatus("Plătită");
             } else if (action.equalsIgnoreCase("confirmed_pending")) {
                 paymentDocument.get().setStatus("Plată în verificare");
