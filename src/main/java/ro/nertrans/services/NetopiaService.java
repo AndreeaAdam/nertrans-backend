@@ -142,7 +142,6 @@ public class NetopiaService {
 
     //    }
     public String cardConfirm(String env_key, String data) throws Exception {
-        //System.out.println("TEST///////////////////////////1cardconfirm///////////////////////////////TEST");
         OpenSSL.extraInit();
         int errorCode = 0;
         String errorMessage = "";
@@ -157,8 +156,6 @@ public class NetopiaService {
             for (String line : lines) {
                 privateKey.append(line).append("\n");
             }
-            //System.out.println("TEST///////////////////////////2cardconfirm TRY///////////////////////////////TEST");
-            //System.out.println(errorType+" "+ errorCode +" "+ errorMessage);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -166,8 +163,6 @@ public class NetopiaService {
         HttpURLConnection con = (HttpURLConnection) confirmUrl.openConnection();
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "application/json");
-        //System.out.println("TEST///////////////////////////2cardconfirm beforeIF///////////////////////////////TEST");
-        //System.out.println(errorType+" "+ errorCode +" "+ errorMessage);
         if (con.getRequestMethod().equalsIgnoreCase("post")) {
             if (env_key == null || env_key.isEmpty()) return "env key null";
             if (data == null || data.isEmpty()) return "data null";
@@ -177,8 +172,6 @@ public class NetopiaService {
 
             errorCode = paymentRequest._objReqNotify._errorCode;
             errorMessage = paymentRequest._objReqNotify._crc;
-            //errorMessage2 = paymentRequest._objReqNotify._errorMessage;
-            //System.out.println(errorType+" "+ errorCode +" "+ errorMessage);
             Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findAll().stream().filter(paymentDocument1 -> (paymentDocument1.getDocSeries() + paymentDocument1.getDocNumber()).equalsIgnoreCase(orderId)).findFirst();
             if(errorCode != 0) {
                 paymentDocument.get().setStatus("Plată respinsă");
@@ -197,8 +190,6 @@ public class NetopiaService {
             }
             paymentDocumentRepository.save(paymentDocument.get());
         }
-        //System.out.println("TEST///////////////////////////2cardconfirm IF///////////////////////////////TEST");
-        //System.out.println(errorType+" "+ errorCode +" "+ errorMessage);
         if(errorCode == 0)
         {
             return "<crc>"+errorMessage+"</crc>";
