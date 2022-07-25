@@ -73,7 +73,8 @@ public class PaymentDocumentService {
         }
         Optional<PaymentDocument> paymentDocument1 = paymentDocumentRepository.findById(paymentDocId);
         //if (!userService.getCurrentUser(request).get().getRoles().contains(UserRoleEnum.ROLE_super_admin)){
-            if (!userService.getCurrentUser(request).get().getOffice().equalsIgnoreCase(paymentDocument1.get().getDocSeries()) || !paymentDocument1.get().getStatus().equalsIgnoreCase("În așteptare")){
+            if (!userService.getCurrentUser(request).get().getOffice().equalsIgnoreCase(paymentDocument1.get().getDocSeries())) {
+                //|| !paymentDocument1.get().getStatus().equalsIgnoreCase("În așteptare"))
                 return "youCannotEditThisDocument";
             }
         //}
