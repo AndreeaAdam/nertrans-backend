@@ -171,11 +171,11 @@ public class PartnerService {
 //                } else {
                     partner.setCUI(row.getCell(cell++).toString());
                 }
-//                if (row.getCell(cell) != null) {
-//                    partner.setUserId(row.getCell(cell++).toString());
-//                } else {
-//                    partner.setUserId(row.getCell(cell++).toString());
-//                }
+                if (row.getCell(cell) != null) {
+                    partner.setClientId(row.getCell(cell++).toString());
+                } else {
+                    partner.setClientId(row.getCell(cell++).toString());
+                }
                 if (row.getCell(cell) != null) {
                     partner.setAddress(row.getCell(cell++).toString());
                 } else {

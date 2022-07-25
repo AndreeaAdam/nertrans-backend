@@ -37,7 +37,6 @@ public class UserService implements UserDetailsService {
     private RandomCodeService randomCodeService;
     @Autowired
     private MailService mailService;
-
     @Autowired
     private NumberCounterService numberUserService;
 

@@ -68,4 +68,6 @@ public class Partner {
     @Field("contact")
     private String contact;
 
+    @Field("clientId")
+    private String clientId;
 }
