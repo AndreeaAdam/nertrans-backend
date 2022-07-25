@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ro.nertrans.JSON.StringSuccessJSON;
+import ro.nertrans.dtos.PartnerEditDTO;
 import ro.nertrans.models.Partner;
 import ro.nertrans.services.PartnerService;
 
@@ -59,16 +60,16 @@ public class PartnerController {
     /**
      * @Description: Updates a partner
      * @param request - used to find the current user
-     * @param partner - the new partner
+     * @param partnerEditDTO - the new partner
      * @param partnerId - used to find the partner to update
      * @return StringSuccessJSON
      */
     @RequestMapping(value = "/updatePartner", method = RequestMethod.PUT)
     @ApiResponse(description = "Updates a partner")
-    public ResponseEntity<?> updatePartner(@RequestBody Partner partner,
+    public ResponseEntity<?> updatePartner(@RequestBody PartnerEditDTO partnerEditDTO,
                                            HttpServletRequest request,
                                            @RequestParam(value = "partnerId") String partnerId) {
-        String response = partnerService.updatePartner(request, partner, partnerId);
+        String response = partnerService.updatePartner(request, partnerEditDTO, partnerId);
         if (response.equalsIgnoreCase("success")) {
             return new ResponseEntity<>(new StringSuccessJSON(true, response), HttpStatus.OK);
         } else
