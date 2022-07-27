@@ -147,14 +147,13 @@ public class PartnerService {
         }
         XSSFSheet worksheet = workbook.getSheetAt(0);
         Optional<User> user = userService.getCurrentUser(request);
-        String idUser = user.get().getId();
         try {
             for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
                 Partner partner = new Partner();
                 partner.setId(null);
                 partner.setNumberPartner(Long.toString(numberCounterService.getNextPartner()));
                 partner.setDate(LocalDateTime.now());
-                partner.setUserId(idUser);
+                partner.setUserId(user.get().getId());
 
                 XSSFRow row = worksheet.getRow(i);
                 int cell = 0;

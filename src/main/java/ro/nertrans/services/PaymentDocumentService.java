@@ -168,11 +168,11 @@ public class PaymentDocumentService {
         }
         Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findById(docId);
         Optional<User> currentUser = userService.getCurrentUser(request);
-        if (currentUser.get().getRoles().contains(UserRoleEnum.ROLE_super_admin)) {
+//        if (currentUser.get().getRoles().contains(UserRoleEnum.ROLE_super_admin)) {
             paymentDocument.get().setStatus(status);
             paymentDocumentRepository.save(paymentDocument.get());
             return "success";
-        } else return "notAllowed";
+//        } else return "notAllowed";
     }
 
 
