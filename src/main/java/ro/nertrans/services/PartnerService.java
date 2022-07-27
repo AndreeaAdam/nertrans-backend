@@ -42,7 +42,6 @@ public class PartnerService {
      * @return String
      */
     public String addPartner(Partner partner, HttpServletRequest request) {
-
         if (partnerRepository.getByCUIIgnoreCase(partner.getCUI()) != null) {
             return "CUIMustBeUnique";
         }
@@ -168,13 +167,9 @@ public class PartnerService {
                 } else {
                     partner.setCIF(row.getCell(cell++).toString());
                 }
-                int CUICell = 0;
                 if (row.getCell(cell) != null) {
-//                    if (partnerRepository.getByCUIIgnoreCase(row.getCell(cell).toString()) == null) {
-//                        partner.setCUI(row.getCell(cell++).toString());
-//                    }
-//                    CUICell = cell;
-//                } else {
+                    partner.setCUI(row.getCell(cell++).toString());
+                }else {
                     partner.setCUI(row.getCell(cell++).toString());
                 }
                 if (row.getCell(cell) != null) {
@@ -223,11 +218,11 @@ public class PartnerService {
                     partner.setContact(row.getCell(cell++).toString());
                 }
                 if (row.getCell(cell) != null) {
-                    partner.setTelephone(row.getCell(cell++).toString());
+                    partner.setTelephone(row.getCell(cell).toString());
                 } else {
-                    partner.setTelephone(row.getCell(cell++).toString());
+                    partner.setTelephone(row.getCell(cell).toString());
                 }
-                if (partnerRepository.getByCUIIgnoreCase(row.getCell(CUICell).toString()) == null) {
+                if (partner.getCUI()!= null && partnerRepository.getByCUIIgnoreCase(partner.getCUI()) == null) {
                     partnerRepository.save(partner);
                 }
             }
