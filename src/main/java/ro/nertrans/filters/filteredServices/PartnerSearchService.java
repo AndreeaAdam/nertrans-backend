@@ -75,6 +75,10 @@ public class PartnerSearchService {
             Criteria partnerEmailCriteria = Criteria.where("email").regex(partnerSearchDTO.getEmail(), "i");
             dynamicQuery.addCriteria(partnerEmailCriteria);
         }
+        if (partnerSearchDTO.getCIF() != null) {
+            Criteria partnerRegistrationCodeCriteria = Criteria.where("CIF").regex(partnerSearchDTO.getCIF(), "i");
+            dynamicQuery.addCriteria(partnerRegistrationCodeCriteria);
+        }
         dynamicQuery.collation(Collation.of("en").
                 strength(Collation.ComparisonLevel.secondary()));
         List<Partner> list = mongoTemplate.find(dynamicQuery, Partner.class);

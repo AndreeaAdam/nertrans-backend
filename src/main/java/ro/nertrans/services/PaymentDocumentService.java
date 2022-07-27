@@ -73,7 +73,8 @@ public class PaymentDocumentService {
         }
         Optional<PaymentDocument> paymentDocument1 = paymentDocumentRepository.findById(paymentDocId);
         if (!userService.getCurrentUser(request).get().getRoles().contains(UserRoleEnum.ROLE_super_admin)){
-            if (!userService.getCurrentUser(request).get().getOffice().equalsIgnoreCase(paymentDocument1.get().getDocSeries()) || !paymentDocument1.get().getStatus().equalsIgnoreCase("În așteptare")){
+            if (!userService.getCurrentUser(request).get().getOffice().equalsIgnoreCase(paymentDocument1.get().getDocSeries())) {
+                //|| !paymentDocument1.get().getStatus().equalsIgnoreCase("În așteptare"))
                 return "youCannotEditThisDocument";
             }
         }
@@ -103,6 +104,10 @@ public class PaymentDocumentService {
      */
     public Optional<PaymentDocument> getPaymentDocumentById(String docId) {
         return paymentDocumentRepository.findById(docId);
+    }
+
+    public Optional<PaymentDocument> getPaymentDocumentBySeriesAndNumber(String docSeries, Long docNumber) {
+        return paymentDocumentRepository.findByDocSeriesAndDocNumber(docSeries,docNumber);
     }
 
     /**
@@ -163,11 +168,11 @@ public class PaymentDocumentService {
         }
         Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findById(docId);
         Optional<User> currentUser = userService.getCurrentUser(request);
-        if (currentUser.get().getRoles().contains(UserRoleEnum.ROLE_super_admin)) {
+//        if (currentUser.get().getRoles().contains(UserRoleEnum.ROLE_super_admin)) {
             paymentDocument.get().setStatus(status);
             paymentDocumentRepository.save(paymentDocument.get());
             return "success";
-        } else return "notAllowed";
+//        } else return "notAllowed";
     }
 
 
@@ -186,4 +191,6 @@ public class PaymentDocumentService {
             return "success";
         }else return "invalidId";
     }
+
+
 }

@@ -10,4 +10,6 @@ import lombok.NoArgsConstructor;
 public class OfficeDTO {
     private String code;
     private String name;
+    private String CIF;
+    private String billSeries;
 }

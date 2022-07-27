@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import ro.mobilPay.payment.Invoice;
 import ro.mobilPay.payment.request.Abstract;
 import ro.mobilPay.payment.request.Card;
-import ro.mobilPay.util.FileHelper;
 import ro.mobilPay.util.ListItem;
 import ro.mobilPay.util.OpenSSL;
 import ro.nertrans.dtos.MobilPayDTO;
@@ -39,6 +38,8 @@ public class NetopiaService {
         OpenSSL.extraInit();
         String signature = settingService.getSettings().get().getNetopiaSignature();
         URL url = new URL(settingService.getSettings().get().getNetopiaPublicKey().getFilePath());
+        //String signature = "Q3F5-2AE2-ESXJ-FLUJ-8WHK";
+        //URL url = new URL("https://nertrans.eu:3838/nertrans/files/setting/sandbox.Q3F5-2AE2-ESXJ-FLUJ-8WHK.public.cer");
         StringBuilder publicCer = new StringBuilder();
         try {
             InputStreamReader isr = new InputStreamReader(url.openStream());
@@ -56,7 +57,7 @@ public class NetopiaService {
 
         req._signature = signature;
         req._confirmUrl = apiUrl +"/nertrans/cardConfirm";
-        req._returnUrl = apiUrl +"/platit-cu-succes";
+        req._returnUrl = apiUrl +"/confirmare-comanda";
         req._orderId = dto.getOrderId();
         req._type = "card";
         Date date = new Date();
@@ -140,8 +141,12 @@ public class NetopiaService {
 //    }
 
     //    }
-    public void cardConfirm(String env_key, String data) throws Exception {
+    public String cardConfirm(String env_key, String data) throws Exception {
         OpenSSL.extraInit();
+        int errorCode = 0;
+        String errorMessage = "";
+        //String errorMessage2 = "";
+        int errorType = ro.mobilPay.payment.request.Abstract.CONFIRM_ERROR_TYPE_NONE;
         URL url = new URL(settingService.getSettings().get().getNetopiaPrivateKey().getFilePath());
         StringBuilder privateKey = new StringBuilder("");
         try {
@@ -159,26 +164,39 @@ public class NetopiaService {
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "application/json");
         if (con.getRequestMethod().equalsIgnoreCase("post")) {
-            if (env_key == null || env_key.isEmpty()) return ;
-            if (data == null || data.isEmpty()) return ;
+            if (env_key == null || env_key.isEmpty()) return "env key null";
+            if (data == null || data.isEmpty()) return "data null";
             Abstract paymentRequest = Abstract.factoryFromEncrypted(env_key, data, privateKey.toString());
             String action = paymentRequest._objReqNotify._action;
             String orderId = paymentRequest._orderId;
+
+            errorCode = paymentRequest._objReqNotify._errorCode;
+            errorMessage = paymentRequest._objReqNotify._crc;
             Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findAll().stream().filter(paymentDocument1 -> (paymentDocument1.getDocSeries() + paymentDocument1.getDocNumber()).equalsIgnoreCase(orderId)).findFirst();
-            if (action.equalsIgnoreCase("confirmed")) {
+            if(errorCode != 0) {
+                paymentDocument.get().setStatus("Plată respinsă");
+            } else if (action.equalsIgnoreCase("confirmed")) {
                 paymentDocument.get().setStatus("Plătită");
             } else if (action.equalsIgnoreCase("confirmed_pending")) {
-                paymentDocument.get().setStatus("Confirmed pending");
+                paymentDocument.get().setStatus("Plată în verificare");
             } else if (action.equalsIgnoreCase("paid_pending")) {
-                paymentDocument.get().setStatus("Paid pending");
+                paymentDocument.get().setStatus("Plată în verificare");
             } else if (action.equalsIgnoreCase("paid")) {
-                paymentDocument.get().setStatus("Paid");
+                paymentDocument.get().setStatus("Plată în verificare");
             } else if (action.equalsIgnoreCase("canceled")) {
-                paymentDocument.get().setStatus("Canceled");
+                paymentDocument.get().setStatus("Plată respinsă");
             } else if (action.equalsIgnoreCase("credit")) {
-                paymentDocument.get().setStatus("Credit");
+                paymentDocument.get().setStatus("Plată returnată");
             }
             paymentDocumentRepository.save(paymentDocument.get());
+        }
+        if(errorCode == 0)
+        {
+            return "<crc>"+errorMessage+"</crc>";
+        }
+        else
+        {
+            return "<crc error_type=\""+errorType+"\" error_code=\""+errorCode+"\">"+errorMessage+"</crc>";
         }
     }
 }

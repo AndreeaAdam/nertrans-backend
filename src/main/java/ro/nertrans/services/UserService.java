@@ -37,7 +37,6 @@ public class UserService implements UserDetailsService {
     private RandomCodeService randomCodeService;
     @Autowired
     private MailService mailService;
-
     @Autowired
     private NumberCounterService numberUserService;
 
@@ -56,7 +55,7 @@ public class UserService implements UserDetailsService {
             User user = new User();
             user.setId("1");
             user.setNumberUser(Long.toString(numberUserService.getNextUser()));
-            user.setEmail("admin@admin.ro");
+            user.setEmail("bogdanpana@thecon.ro");
             user.setFirstName("Admin");
             user.setLastName("Admin");
             user.setActive(true);
@@ -65,7 +64,7 @@ public class UserService implements UserDetailsService {
             ArrayList<UserRoleEnum> roles = new ArrayList<>();
             roles.add(UserRoleEnum.ROLE_super_admin);
             user.setRoles(roles);
-            user.setPassword(securityConfig.passwordEncoder().encode("admin"));
+            user.setPassword(securityConfig.passwordEncoder().encode("DnNC3rVm"));
             userRepository.save(user);
         }
     }

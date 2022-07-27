@@ -3,13 +3,17 @@ package ro.nertrans.controllers;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ro.nertrans.JSON.StringSuccessJSON;
+import ro.nertrans.dtos.PartnerEditDTO;
 import ro.nertrans.models.Partner;
 import ro.nertrans.services.PartnerService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.ArrayList;
 
 @CrossOrigin
@@ -56,16 +60,16 @@ public class PartnerController {
     /**
      * @Description: Updates a partner
      * @param request - used to find the current user
-     * @param partner - the new partner
+     * @param partnerEditDTO - the new partner
      * @param partnerId - used to find the partner to update
      * @return StringSuccessJSON
      */
     @RequestMapping(value = "/updatePartner", method = RequestMethod.PUT)
     @ApiResponse(description = "Updates a partner")
-    public ResponseEntity<?> updatePartner(@RequestBody Partner partner,
+    public ResponseEntity<?> updatePartner(@RequestBody PartnerEditDTO partnerEditDTO,
                                            HttpServletRequest request,
                                            @RequestParam(value = "partnerId") String partnerId) {
-        String response = partnerService.updatePartner(request, partner, partnerId);
+        String response = partnerService.updatePartner(request, partnerEditDTO, partnerId);
         if (response.equalsIgnoreCase("success")) {
             return new ResponseEntity<>(new StringSuccessJSON(true, response), HttpStatus.OK);
         } else
@@ -86,5 +90,16 @@ public class PartnerController {
         if (response.equalsIgnoreCase("success")) {
             return new ResponseEntity<>(new StringSuccessJSON(true, response), HttpStatus.OK);
         } else return new ResponseEntity<>(new StringSuccessJSON(false, response), HttpStatus.BAD_REQUEST);
+    }
+
+    @RequestMapping(value = "/importPartners", method = RequestMethod.POST,
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> importPartners(@RequestParam(value = "file") MultipartFile file,
+                                         HttpServletRequest request) {
+        try {
+            return new ResponseEntity<>(partnerService.importPartners(file, request), HttpStatus.OK);
+        } catch (IOException e) {
+            return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
+        }
     }
 }

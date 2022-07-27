@@ -14,4 +14,5 @@ public class PartnerSearchDTO {
     private String address;
     private String email;
     private String userId;
+    private String CIF;
 }
