@@ -135,6 +135,13 @@ public class PartnerService {
         return partners;
     }
 
+    /**
+     * @param reapExcelDataFile    - the actual file to import
+     * @param request - used to find the current user
+     * @return boolean
+     * @throws IOException - exception
+     * @Description: Imports a list with prices for articles
+     */
     public boolean importPartners(MultipartFile reapExcelDataFile, HttpServletRequest request) throws IOException {
         if (userService.getCurrentUser(request).isEmpty()){
             return false;
