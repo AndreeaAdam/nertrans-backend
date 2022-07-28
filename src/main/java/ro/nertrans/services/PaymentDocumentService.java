@@ -106,6 +106,12 @@ public class PaymentDocumentService {
         return paymentDocumentRepository.findById(docId);
     }
 
+    /**
+     * @param docSeries - used to find the document by series
+     * @param docNumber - used to find the document by number
+     * @return Optional<PaymentDocument>
+     * @Description: Returns a single doc by series and number
+     */
     public Optional<PaymentDocument> getPaymentDocumentBySeriesAndNumber(String docSeries, Long docNumber) {
         return paymentDocumentRepository.findByDocSeriesAndDocNumber(docSeries,docNumber);
     }

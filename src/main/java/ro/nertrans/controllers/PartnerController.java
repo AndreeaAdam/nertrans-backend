@@ -92,6 +92,12 @@ public class PartnerController {
         } else return new ResponseEntity<>(new StringSuccessJSON(false, response), HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * @Description: Imports a list with partners
+     * @param request - used to find the current user
+     * @param file - the actual file to import
+     * @return boolean
+     */
     @RequestMapping(value = "/importPartners", method = RequestMethod.POST,
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> importPartners(@RequestParam(value = "file") MultipartFile file,
