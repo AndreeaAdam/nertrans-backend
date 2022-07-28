@@ -31,7 +31,8 @@ public class PartnerService {
     private UserService userService;
     @Autowired
     private PaymentDocumentRepository paymentDocumentRepository;
-
+    @Autowired
+    private PaymentDocumentService paymentDocumentService;
     @Autowired
     private NumberCounterService numberCounterService;
 
@@ -74,6 +75,7 @@ public class PartnerService {
             return "youAreNotLoggedIn";
         }
         if (partnerRepository.findById(partnerId).isPresent()){
+            paymentDocumentService.updatePaymentDocumentPartnerNameAndCUI(partnerId);
             partnerRepository.deleteById(partnerId);
             return "success";
         }else return "invalidId";
