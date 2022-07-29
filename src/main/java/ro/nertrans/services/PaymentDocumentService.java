@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ro.nertrans.config.UserRoleEnum;
 import ro.nertrans.dtos.OfficeNumberDTO;
+import ro.nertrans.models.Partner;
 import ro.nertrans.models.PaymentDocument;
 import ro.nertrans.models.Setting;
 import ro.nertrans.models.User;
@@ -13,6 +14,7 @@ import ro.nertrans.repositories.SettingRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -91,11 +93,26 @@ public class PaymentDocumentService {
         paymentDocument1.get().setLocalReferenceNumber(paymentDocument.getDocSeries() + " " + paymentDocument.getDocNumber());
         paymentDocument1.get().setLicenseNumber(paymentDocument.getLicenseNumber());
         paymentDocument1.get().setWarranty(paymentDocument.getWarranty());
+
         if (paymentDocument.getPartnerId() != null && partnerRepository.findById(paymentDocument.getPartnerId()).isPresent()){
             paymentDocument1.get().setPartnerName(partnerRepository.findById(paymentDocument.getPartnerId()).get().getName());
         }
         paymentDocumentRepository.save(paymentDocument1.get());
         return "success";
+    }
+
+    /**
+     * @param partnerId - used to find the partner
+     * @Description: updates the payment documents with partner name and partner CUI
+     */
+    public void updatePaymentDocumentPartnerNameAndCUI(String partnerId) {
+        Optional<Partner> partner = partnerRepository.findById(partnerId);
+        List<PaymentDocument> paymentDocuments = paymentDocumentRepository.findAllByPartnerId(partnerId);
+        for (PaymentDocument paymentDocument1 : paymentDocuments ) {
+            paymentDocument1.setPartnerName(partner.get().getName());
+            paymentDocument1.setPartnerCUI(partner.get().getCUI());
+            paymentDocumentRepository.save(paymentDocument1);
+        }
     }
     /**
      * @param docId - used to find the document

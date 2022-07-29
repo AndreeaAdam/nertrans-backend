@@ -66,6 +66,9 @@ public class PaymentDocument {
     @Field("partnerName")
     private String partnerName;
 
+    @Field("partnerCUI")
+    private String partnerCUI;
+
     @Field("applyTVA")
     private boolean applyTVA;
 
