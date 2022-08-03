@@ -81,4 +81,10 @@ public class PaymentDocument {
     @Field("warranty")
     private String warranty;
 
+    @Field("proformaSeries")
+    private String proformaSeries;
+
+    @Field("proformaNumber")
+    private String proformaNumber;
+
 }

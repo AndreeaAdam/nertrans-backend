@@ -12,4 +12,6 @@ public class OfficeDTO {
     private String name;
     private String CIF;
     private String billSeries;
+    private String proformaSeries;
+    private String receiptSeries;
 }
