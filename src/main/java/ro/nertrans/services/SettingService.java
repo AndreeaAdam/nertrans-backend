@@ -53,8 +53,6 @@ public class SettingService {
             setting1.get().setSmartBillToken(setting.getSmartBillToken());
             setting1.get().setSmartBillFiscalCode(setting.getSmartBillFiscalCode());
             setting1.get().setUserOffices(setting.getUserOffices());
-            setting1.get().setEuPlatescKey(setting.getEuPlatescKey());
-            setting1.get().setEuPlatescMerchId(setting.getEuPlatescMerchId());
             setting1.get().setNetopiaSignature(setting.getNetopiaSignature());
             setting1.get().setNetopiaPrivateKey(setting.getNetopiaPrivateKey());
             setting1.get().setNetopiaPublicKey(setting.getNetopiaPublicKey());

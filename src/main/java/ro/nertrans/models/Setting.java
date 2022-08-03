@@ -36,12 +36,6 @@ public class Setting {
     @Field("officeNumber")
     private ArrayList<OfficeNumberDTO> officeNumber;
 
-    @Field("euPlatescKey")
-    private String euPlatescKey;
-
-    @Field("euPlatescMerchId")
-    private String euPlatescMerchId;
-
     @Field("netopiaSignature")
     private String netopiaSignature;
 
