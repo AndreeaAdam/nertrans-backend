@@ -87,6 +87,8 @@ public class PaymentDocumentService {
         paymentDocument1.get().setLocalReferenceNumber(paymentDocument.getDocSeries() + " " + paymentDocument.getDocNumber());
         paymentDocument1.get().setLicenseNumber(paymentDocument.getLicenseNumber());
         paymentDocument1.get().setWarranty(paymentDocument.getWarranty());
+        paymentDocument1.get().setProformaNumber(paymentDocument.getProformaNumber());
+        paymentDocument1.get().setProformaSeries(paymentDocument.getProformaSeries());
 
         if (paymentDocument.getPartnerId() != null && partnerRepository.findById(paymentDocument.getPartnerId()).isPresent()){
             paymentDocument1.get().setPartnerName(partnerRepository.findById(paymentDocument.getPartnerId()).get().getName());
@@ -185,11 +187,9 @@ public class PaymentDocumentService {
         }
         Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findById(docId);
         Optional<User> currentUser = userService.getCurrentUser(request);
-        if (currentUser.get().getRoles().contains(UserRoleEnum.ROLE_super_admin)) {
-            paymentDocument.get().setStatus(status);
-            paymentDocumentRepository.save(paymentDocument.get());
-            return "success";
-        } else return "notAllowed";
+        paymentDocument.get().setStatus(status);
+        paymentDocumentRepository.save(paymentDocument.get());
+        return "success";
     }
 
 
