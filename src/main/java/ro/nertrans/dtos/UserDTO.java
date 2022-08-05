@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,7 +17,7 @@ public class UserDTO {
     private String email;
     private String address;
     private String employeeCode;
-    private String office;
+    private ArrayList<String> office;
     private boolean actLikeAdmin;
 
 }

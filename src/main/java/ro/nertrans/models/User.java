@@ -53,7 +53,7 @@ public class User {
     private String employeeCode;
 
     @Field("office")
-    private String office;
+    private ArrayList<String> office;
 
     @Field("roles")
     private ArrayList<UserRoleEnum> roles;
