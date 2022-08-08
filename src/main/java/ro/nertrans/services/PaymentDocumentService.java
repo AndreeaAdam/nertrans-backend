@@ -49,7 +49,9 @@ public class PaymentDocumentService {
         paymentDocument.setId(null);
         paymentDocument.setDate(LocalDateTime.now());
         paymentDocument.setUserId(userService.getCurrentUser(request).get().getId());
-        paymentDocument.setDocNumber(incrementDocNumberByOffice(paymentDocument.getDocSeries()));
+        paymentDocument.setDocNumber(incrementDocNumberByOffice(paymentDocument.getDocSeries()));if (paymentDocumentRepository.findByDocSeriesAndDocNumber(paymentDocument.getDocSeries(), paymentDocument.getDocNumber()).isPresent()){
+            return "alreadyExists";
+        }
         if (paymentDocument.getPartnerId() != null && partnerRepository.findById(paymentDocument.getPartnerId()).isPresent()){
             paymentDocument.setPartnerName(partnerRepository.findById(paymentDocument.getPartnerId()).get().getName());
         }
