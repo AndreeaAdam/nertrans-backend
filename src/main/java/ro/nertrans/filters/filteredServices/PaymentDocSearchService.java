@@ -61,7 +61,7 @@ public class PaymentDocSearchService {
                 dynamicQuery.addCriteria(docSeriesCriteria);
             }
         } else {
-            docSeriesCriteria = Criteria.where("docSeries").is(user.get().getOffice());
+            docSeriesCriteria = Criteria.where("docSeries").in(user.get().getOffice());
             dynamicQuery.addCriteria(docSeriesCriteria);
         }
         if (paymentDocumentSearchDTO.getName() != null) {
