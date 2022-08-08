@@ -64,7 +64,7 @@ public class UserSearchService {
             dynamicQuery.addCriteria(userEmailCriteria);
         }
         if (user.getOffice() != null) {
-            Criteria userOfficeCriteria = Criteria.where("office").regex(user.getOffice(), "i");
+            Criteria userOfficeCriteria = Criteria.where("office").in(user.getOffice());
             dynamicQuery.addCriteria(userOfficeCriteria);
         }
         Criteria superAdminCriteria = Criteria.where("roles").ne("ROLE_super_admin");
