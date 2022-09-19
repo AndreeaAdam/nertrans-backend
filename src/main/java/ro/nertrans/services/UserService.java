@@ -39,9 +39,6 @@ public class UserService implements UserDetailsService {
     private MailService mailService;
     @Autowired
     private NumberCounterService numberUserService;
-
-    @Value("${apiUrl}")
-    private String apiUrl;
     @Value("${apiUrlPort}")
     private String apiUrlPort;
 

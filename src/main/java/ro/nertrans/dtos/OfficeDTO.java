@@ -14,4 +14,5 @@ public class OfficeDTO {
     private String billSeries;
     private String proformaSeries;
     private String receiptSeries;
+    private Long number;
 }

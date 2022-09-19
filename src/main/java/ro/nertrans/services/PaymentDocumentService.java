@@ -1,8 +1,10 @@
 package ro.nertrans.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-import ro.nertrans.config.UserRoleEnum;
+import ro.nertrans.dtos.OfficeDTO;
 import ro.nertrans.dtos.OfficeNumberDTO;
 import ro.nertrans.models.Partner;
 import ro.nertrans.models.PaymentDocument;
@@ -49,7 +51,8 @@ public class PaymentDocumentService {
         paymentDocument.setId(null);
         paymentDocument.setDate(LocalDateTime.now());
         paymentDocument.setUserId(userService.getCurrentUser(request).get().getId());
-        paymentDocument.setDocNumber(incrementDocNumberByOffice(paymentDocument.getDocSeries()));if (paymentDocumentRepository.findByDocSeriesAndDocNumber(paymentDocument.getDocSeries(), paymentDocument.getDocNumber()).isPresent()){
+        paymentDocument.setDocNumber(incrementDocNumberByOffice(paymentDocument.getDocSeries()));
+        if (paymentDocumentRepository.findByDocSeriesAndDocNumber(paymentDocument.getDocSeries(), paymentDocument.getDocNumber()).isPresent()){
             return "alreadyExists";
         }
         if (paymentDocument.getPartnerId() != null && partnerRepository.findById(paymentDocument.getPartnerId()).isPresent()){
@@ -137,8 +140,8 @@ public class PaymentDocumentService {
      * @return Long
      */
     public Long getMaxNumberByOffice(String office) {
-        Optional<OfficeNumberDTO> dto = settingService.getSettings().get().getOfficeNumber().stream().filter(officeNumberDTO -> officeNumberDTO.getOffice().equalsIgnoreCase(office)).findFirst();
-        return dto.map(officeNumberDTO -> officeNumberDTO.getNumber() + 1).orElse(1L);
+        Optional<OfficeDTO> dto = settingService.getSettings().get().getUserOffices().stream().filter(officeDTO -> officeDTO.getCode().equalsIgnoreCase(office)).findFirst();
+        return dto.map(officeDTO -> officeDTO.getNumber() + 1).orElse(1L);
     }
 
     /**
@@ -167,12 +170,11 @@ public class PaymentDocumentService {
      */
     public Long incrementDocNumberByOffice(String office) {
         Optional<Setting> setting = settingService.getSettings();
-        Optional<OfficeNumberDTO> dto = setting.get().getOfficeNumber().stream().filter(officeNumberDTO -> officeNumberDTO.getOffice().equalsIgnoreCase(office)).findFirst();
+        Optional<OfficeDTO> dto = setting.get().getUserOffices().stream().filter(officeDTO -> officeDTO.getCode().equalsIgnoreCase(office)).findFirst();
         dto.get().setNumber(dto.get().getNumber() + 1);
         settingRepository.save(setting.get());
         return dto.get().getNumber();
     }
-
     /**
      * @Description: Changes status for a payment document
      * @param docId - used to find the payment document

@@ -33,9 +33,6 @@ public class Setting {
     @Field("userOffices")
     private ArrayList<OfficeDTO> userOffices;
 
-    @Field("officeNumber")
-    private ArrayList<OfficeNumberDTO> officeNumber;
-
     @Field("netopiaSignature")
     private String netopiaSignature;
 

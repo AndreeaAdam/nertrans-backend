@@ -5,13 +5,11 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import ro.nertrans.config.UserRoleEnum;
-import ro.nertrans.dtos.OfficeNumberDTO;
 import ro.nertrans.models.Setting;
 import ro.nertrans.models.User;
 import ro.nertrans.repositories.SettingRepository;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
@@ -56,14 +54,6 @@ public class SettingService {
             setting1.get().setNetopiaSignature(setting.getNetopiaSignature());
             setting1.get().setNetopiaPrivateKey(setting.getNetopiaPrivateKey());
             setting1.get().setNetopiaPublicKey(setting.getNetopiaPublicKey());
-            if (setting1.get().getOfficeNumber() == null) {
-                setting1.get().setOfficeNumber(new ArrayList<>());
-            }
-            setting1.get().getUserOffices().forEach(office -> {
-                if (setting1.get().getOfficeNumber().stream().noneMatch(s -> s.getOffice().equals(office.getCode()))) {
-                    setting1.get().getOfficeNumber().add(new OfficeNumberDTO(office.getCode(), 0L));
-                }
-            });
             settingRepository.save(setting1.get());
             return "success";
         } else return "notAllowed";
