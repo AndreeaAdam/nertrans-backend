@@ -1,15 +1,11 @@
 package ro.nertrans.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import ro.nertrans.dtos.OfficeDTO;
-import ro.nertrans.dtos.OfficeNumberDTO;
 import ro.nertrans.models.Partner;
 import ro.nertrans.models.PaymentDocument;
 import ro.nertrans.models.Setting;
-import ro.nertrans.models.User;
 import ro.nertrans.repositories.PartnerRepository;
 import ro.nertrans.repositories.PaymentDocumentRepository;
 import ro.nertrans.repositories.SettingRepository;
@@ -75,31 +71,34 @@ public class PaymentDocumentService {
         if (userService.getCurrentUser(request).isEmpty()) {
             return "youAreNotLoggedIn";
         }
-        if (paymentDocumentRepository.findById(paymentDocId).isEmpty()) {
-            return "invalidId";
+        if (paymentDocumentRepository.findById(paymentDocId).isPresent()) {
+            Optional<PaymentDocument> paymentDocument1 = paymentDocumentRepository.findById(paymentDocId);
+            if (paymentDocument1.isPresent()){
+                PaymentDocument document = paymentDocument1.get();
+                document.setAttachment(paymentDocument.getAttachment());
+                document.setName(paymentDocument.getName());
+                document.setPaymentMethod(paymentDocument.getPaymentMethod());
+                document.setCurrency(paymentDocument.getCurrency());
+                document.setValue(paymentDocument.getValue());
+                document.setFiscalBillSeries(paymentDocument.getFiscalBillSeries());
+                document.setFiscalBillNumber(paymentDocument.getFiscalBillNumber());
+                document.setStatus(paymentDocument.getStatus());
+                document.setPartnerId(paymentDocument.getPartnerId());
+                document.setApplyTVA(paymentDocument.isApplyTVA());
+                document.setLocalReferenceNumber(paymentDocument.getDocSeries() + " " + paymentDocument.getDocNumber());
+                document.setLicenseNumber(paymentDocument.getLicenseNumber());
+                document.setWarranty(paymentDocument.getWarranty());
+                document.setProformaNumber(paymentDocument.getProformaNumber());
+                document.setProformaSeries(paymentDocument.getProformaSeries());
+                document.setExpirationDate(paymentDocument.getExpirationDate());
+                if (paymentDocument.getPartnerId() != null && partnerRepository.findById(paymentDocument.getPartnerId()).isPresent()){
+                    paymentDocument1.get().setPartnerName(partnerRepository.findById(paymentDocument.getPartnerId()).get().getName());
+                }
+                paymentDocumentRepository.save(paymentDocument1.get());
+                return "success";
+            }
         }
-        Optional<PaymentDocument> paymentDocument1 = paymentDocumentRepository.findById(paymentDocId);
-        paymentDocument1.get().setAttachment(paymentDocument.getAttachment());
-        paymentDocument1.get().setName(paymentDocument.getName());
-        paymentDocument1.get().setPaymentMethod(paymentDocument.getPaymentMethod());
-        paymentDocument1.get().setCurrency(paymentDocument.getCurrency());
-        paymentDocument1.get().setValue(paymentDocument.getValue());
-        paymentDocument1.get().setFiscalBillSeries(paymentDocument.getFiscalBillSeries());
-        paymentDocument1.get().setFiscalBillNumber(paymentDocument.getFiscalBillNumber());
-        paymentDocument1.get().setStatus(paymentDocument.getStatus());
-        paymentDocument1.get().setPartnerId(paymentDocument.getPartnerId());
-        paymentDocument1.get().setApplyTVA(paymentDocument.isApplyTVA());
-        paymentDocument1.get().setLocalReferenceNumber(paymentDocument.getDocSeries() + " " + paymentDocument.getDocNumber());
-        paymentDocument1.get().setLicenseNumber(paymentDocument.getLicenseNumber());
-        paymentDocument1.get().setWarranty(paymentDocument.getWarranty());
-        paymentDocument1.get().setProformaNumber(paymentDocument.getProformaNumber());
-        paymentDocument1.get().setProformaSeries(paymentDocument.getProformaSeries());
-
-        if (paymentDocument.getPartnerId() != null && partnerRepository.findById(paymentDocument.getPartnerId()).isPresent()){
-            paymentDocument1.get().setPartnerName(partnerRepository.findById(paymentDocument.getPartnerId()).get().getName());
-        }
-        paymentDocumentRepository.save(paymentDocument1.get());
-        return "success";
+       return "invalidId";
     }
 
     /**
@@ -190,10 +189,30 @@ public class PaymentDocumentService {
             return "invalidId";
         }
         Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findById(docId);
-        Optional<User> currentUser = userService.getCurrentUser(request);
         paymentDocument.get().setStatus(status);
         paymentDocumentRepository.save(paymentDocument.get());
         return "success";
+    }
+    /**
+     * @Description: Changes operation status for a payment document
+     * @param docId - used to find the payment document
+     * @param operationStatus - the new  operation status
+     * @param request - used to find the current user
+     * @return String
+     */
+    public String changePaymentDocumentOperationStatus(String docId, String operationStatus, HttpServletRequest request) {
+        if (userService.getCurrentUser(request).isEmpty()) {
+            return "youAreNotLoggedIn";
+        }
+        if (paymentDocumentRepository.findById(docId).isEmpty()) {
+            return "invalidId";
+        }
+        Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findById(docId);
+        if (paymentDocument.isPresent()){
+            paymentDocument.get().setOperationStatus(operationStatus);
+            paymentDocumentRepository.save(paymentDocument.get());
+            return "success";
+        }return "invalidId";
     }
 
 

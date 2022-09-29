@@ -47,6 +47,18 @@ public class PaymentDocumentController {
             return new ResponseEntity<>(new StringSuccessJSON(false, response), HttpStatus.BAD_REQUEST);
     }
 
+    @PutMapping(value = "/changePaymentDocumentOperationStatus")
+    @ApiResponse(description = "Changes operation status for a payment document")
+    public ResponseEntity<?> changePaymentDocumentOperationStatus(@RequestParam(value = "operationStatus") String operationStatus,
+                                                         @RequestParam(value = "docId") String docId,
+                                                         HttpServletRequest request) {
+        String response = paymentDocumentService.changePaymentDocumentOperationStatus(docId, operationStatus, request);
+        if (response.equalsIgnoreCase("success")) {
+            return new ResponseEntity<>(new StringSuccessJSON(true, response), HttpStatus.OK);
+        } else
+            return new ResponseEntity<>(new StringSuccessJSON(false, response), HttpStatus.BAD_REQUEST);
+    }
+
     @RequestMapping(value = "/updatePaymentDocument", method = RequestMethod.PUT)
     @ApiResponse(description = "Updates a payment document")
     public ResponseEntity<?> updatePaymentDocument(@RequestBody PaymentDocument paymentDocument,

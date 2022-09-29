@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import ro.nertrans.dtos.FileDTO;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -86,5 +87,11 @@ public class PaymentDocument {
 
     @Field("proformaNumber")
     private String proformaNumber;
+
+    @Field("operationStatus")
+    private String operationStatus;
+
+    @Field("expirationDate")
+    private LocalDate expirationDate;
 
 }
