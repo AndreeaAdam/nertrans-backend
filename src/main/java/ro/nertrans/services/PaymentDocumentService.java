@@ -3,6 +3,7 @@ package ro.nertrans.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ro.nertrans.dtos.OfficeDTO;
+import ro.nertrans.dtos.OperationStatusDTO;
 import ro.nertrans.models.Partner;
 import ro.nertrans.models.PaymentDocument;
 import ro.nertrans.models.Setting;
@@ -12,6 +13,7 @@ import ro.nertrans.repositories.SettingRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -232,5 +234,18 @@ public class PaymentDocumentService {
         }else return "invalidId";
     }
 
+    /**
+     * @Description: Returns a list with documents number by status
+     * @param statuses - status's list
+     * @return List<OperationStatusDTO>
+     */
+    public List<OperationStatusDTO> getDocumentNumberByStatuses(List<String> statuses){
+       List<OperationStatusDTO> statusDTOS = new ArrayList<>();
+       for (String status: statuses){
+           OperationStatusDTO dto = new OperationStatusDTO(status, paymentDocumentRepository.findByOperationStatusIgnoreCase(status).size());
+           statusDTOS.add(dto);
+       }
+       return statusDTOS;
+    }
 
 }

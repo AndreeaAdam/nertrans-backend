@@ -20,6 +20,7 @@ public class PaymentDocumentSearchDTO {
     private String localReferenceNumber;
     private String startDate;
     private String endDate;
-    private LocalDate expirationDate;
+    private LocalDate startExpirationDate;
+    private LocalDate endExpirationDate;
     private String operationStatus;
 }

@@ -12,9 +12,11 @@ import ro.nertrans.dtos.MobilPayDTO;
 import ro.nertrans.models.PaymentDocument;
 import ro.nertrans.services.FileService;
 import ro.nertrans.services.PaymentDocumentService;
+import ro.nertrans.services.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -23,6 +25,8 @@ public class PaymentDocumentController {
     private FileService fileService;
     @Autowired
     private PaymentDocumentService paymentDocumentService;
+    @Autowired
+    private UserService userService;
 
     @RequestMapping(value = "/createPaymentDocument", method = RequestMethod.POST)
     @ApiResponse(description = "Creates a new payment document")
@@ -107,6 +111,15 @@ public class PaymentDocumentController {
     @ApiResponse(description = "Returns the maximum number for a payment document by office")
     public ResponseEntity<?> getMaxNumberByOffice(@RequestParam(value = "office") String office) {
         return new ResponseEntity<>(paymentDocumentService.getMaxNumberByOffice(office), HttpStatus.OK);
+    }
+    @RequestMapping(value = "/getDocumentNumberByStatuses", method = RequestMethod.GET)
+    @ApiResponse(description = "Returns the maximum number for a payment document by office")
+    public ResponseEntity<?> getDocumentNumberByStatuses(@RequestBody List<String> statuses,
+                                                         HttpServletRequest request) {
+        if (userService.getCurrentUser(request).isEmpty()){
+            return new ResponseEntity<>(new StringSuccessJSON(false, "notLoggedIn"), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(paymentDocumentService.getDocumentNumberByStatuses(statuses), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/deletePaymentDocument", method = RequestMethod.DELETE)

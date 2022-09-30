@@ -9,7 +9,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Collation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import ro.nertrans.config.UserRoleEnum;
 import ro.nertrans.filters.filteredDTOS.PaymentDocumentSearchDTO;
@@ -94,8 +93,8 @@ public class PaymentDocSearchService {
             Criteria operationalStatusCriteria = Criteria.where("operationStatus").is(paymentDocumentSearchDTO.getOperationStatus());
             dynamicQuery.addCriteria(operationalStatusCriteria);
         }
-        if (paymentDocumentSearchDTO.getExpirationDate() != null) {
-            Criteria expirationDateCriteria = Criteria.where("expirationDate").is(paymentDocumentSearchDTO.getExpirationDate());
+        if (paymentDocumentSearchDTO.getStartExpirationDate() != null && paymentDocumentSearchDTO.getEndExpirationDate() != null) {
+            Criteria expirationDateCriteria = Criteria.where("expirationDate").gte(paymentDocumentSearchDTO.getStartExpirationDate()).lte(paymentDocumentSearchDTO.getEndExpirationDate());
             dynamicQuery.addCriteria(expirationDateCriteria);
         }
         if (paymentDocumentSearchDTO.getStartDate() != null && paymentDocumentSearchDTO.getEndDate() != null) {
@@ -106,10 +105,6 @@ public class PaymentDocSearchService {
         dynamicQuery.collation(Collation.of("en").
                 strength(Collation.ComparisonLevel.secondary()));
         List<PaymentDocument> list = mongoTemplate.find(dynamicQuery, PaymentDocument.class);
-
-        return PageableExecutionUtils.getPage(
-                list,
-                pageable,
-                () -> mongoTemplate.count(Query.of(dynamicQuery).limit(-1).skip(-1), PaymentDocument.class));
+        return org.springframework.data.support.PageableExecutionUtils.getPage(list, pageable, () -> mongoTemplate.count(Query.of(dynamicQuery).limit(-1).skip(-1), PaymentDocument.class));
     }
 }

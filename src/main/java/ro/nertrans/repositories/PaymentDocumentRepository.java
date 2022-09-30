@@ -11,4 +11,5 @@ public interface PaymentDocumentRepository extends MongoRepository<PaymentDocume
     Optional<PaymentDocument> findByDocSeriesAndDocNumber(String docSeries, Long docNumber);
 
     List<PaymentDocument> findAllByPartnerId(String partnerId);
+    List<PaymentDocument> findByOperationStatusIgnoreCase(String operationStatus);
 }
