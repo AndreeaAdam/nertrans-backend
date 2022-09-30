@@ -112,7 +112,7 @@ public class PaymentDocumentController {
     public ResponseEntity<?> getMaxNumberByOffice(@RequestParam(value = "office") String office) {
         return new ResponseEntity<>(paymentDocumentService.getMaxNumberByOffice(office), HttpStatus.OK);
     }
-    @RequestMapping(value = "/getDocumentNumberByStatuses", method = RequestMethod.GET)
+    @RequestMapping(value = "/getDocumentNumberByStatuses", method = RequestMethod.POST)
     @ApiResponse(description = "Returns the maximum number for a payment document by office")
     public ResponseEntity<?> getDocumentNumberByStatuses(@RequestBody List<String> statuses,
                                                          HttpServletRequest request) {
