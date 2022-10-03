@@ -15,6 +15,7 @@ import ro.nertrans.services.PaymentDocumentService;
 import ro.nertrans.services.UserService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +58,18 @@ public class PaymentDocumentController {
                                                          @RequestParam(value = "docId") String docId,
                                                          HttpServletRequest request) {
         String response = paymentDocumentService.changePaymentDocumentOperationStatus(docId, operationStatus, request);
+        if (response.equalsIgnoreCase("success")) {
+            return new ResponseEntity<>(new StringSuccessJSON(true, response), HttpStatus.OK);
+        } else
+            return new ResponseEntity<>(new StringSuccessJSON(false, response), HttpStatus.BAD_REQUEST);
+    }
+
+    @PutMapping(value = "/changePaymentDocumentLimitDate")
+    @ApiResponse(description = "Changes limit date for a payment document")
+    public ResponseEntity<?> changePaymentDocumentLimitDate(@RequestParam(value = "limitDate") LocalDate limitDate,
+                                                         @RequestParam(value = "docId") String docId,
+                                                         HttpServletRequest request) {
+        String response = paymentDocumentService.changePaymentDocumentLimitDate(docId, limitDate, request);
         if (response.equalsIgnoreCase("success")) {
             return new ResponseEntity<>(new StringSuccessJSON(true, response), HttpStatus.OK);
         } else
