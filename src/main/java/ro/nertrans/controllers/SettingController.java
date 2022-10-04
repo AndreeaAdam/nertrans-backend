@@ -28,7 +28,7 @@ public class SettingController {
      * @return Optional<Setting>
      * @Description: Returns the setting
      */
-    @RequestMapping(value = "/getSettings", method = RequestMethod.GET)
+    @GetMapping(value = "/getSettings")
     @ApiResponse(description = " Returns the setting")
     public ResponseEntity<?> getSettings() {
         return new ResponseEntity<>(settingService.getSettings(), HttpStatus.OK);
@@ -41,9 +41,9 @@ public class SettingController {
      * @Description: Updates settings
      */
     @Secured({"ROLE_super_admin"})
-    @RequestMapping(value = "/updateSetting", method = RequestMethod.PUT)
+    @PutMapping(value = "/updateSetting")
     @ApiResponse(description = "Updates settings")
-    public ResponseEntity<?> updateSetting(@RequestBody Setting setting,
+    public ResponseEntity<StringSuccessJSON> updateSetting(@RequestBody Setting setting,
                                            HttpServletRequest request) {
         String response = settingService.updateSetting(request, setting);
         if (response.equalsIgnoreCase("success")) {
@@ -51,8 +51,7 @@ public class SettingController {
         } else return new ResponseEntity<>(new StringSuccessJSON(false, response), HttpStatus.BAD_REQUEST);
     }
 
-    @RequestMapping(value = "/uploadMobilPayKey", method = RequestMethod.POST,
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/uploadMobilPayKey", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadMobilPayKey(@RequestParam("file") MultipartFile file,
                                                HttpServletRequest request,
                                                @RequestParam("isPublicKey") boolean isPublicKey) {

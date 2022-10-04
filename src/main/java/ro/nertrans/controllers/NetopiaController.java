@@ -15,7 +15,7 @@ public class NetopiaController {
     @Autowired
     private NetopiaService netopiaService;
 
-    @RequestMapping(value = "/initPayment", method = RequestMethod.POST)
+    @PostMapping(value = "/initPayment")
     public ResponseEntity<?> initPayment(@RequestBody MobilPayDTO dto) {
         try {
             return new ResponseEntity<>(netopiaService.initPayment(dto), HttpStatus.OK);
@@ -24,11 +24,10 @@ public class NetopiaController {
         }
     }
 
-    @RequestMapping(value = "/cardConfirm", method = RequestMethod.POST)
+    @PostMapping(value = "/cardConfirm")
     public Object cardConfirm(@RequestParam(value = "env_key") String env_key,
                               @RequestParam(value = "data") String data) {
         try {
-             //netopiaService.cardConfirm(env_key, data);
             return netopiaService.cardConfirm(env_key, data);
         } catch (IOException e) {
             e.printStackTrace();

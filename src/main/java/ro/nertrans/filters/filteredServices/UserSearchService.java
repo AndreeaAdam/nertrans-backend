@@ -35,11 +35,9 @@ public class UserSearchService {
      * @Description: Filtered and paginated list of users
      */
     public Page<User> listUsersFiltered(UserSearchDTO user, int page, int size, String sort, String dir) {
-        Pageable pageable;
-        if (size == -1 && userRepository.findAll().size() > 0) {
+        Pageable   pageable = PageRequest.of(page, size);
+        if (size == -1 && !userRepository.findAll().isEmpty()) {
             pageable = PageRequest.of(page, userRepository.findAll().size());
-        } else {
-            pageable = PageRequest.of(page, size);
         }
         Query dynamicQuery;
         /**

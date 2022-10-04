@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ro.nertrans.JSON.StringSuccessJSON;
@@ -15,6 +16,7 @@ import ro.nertrans.services.PartnerService;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -28,9 +30,9 @@ public class PartnerController {
      * @param request - used to find the current user
      * @return StringSuccessJSON
      */
-    @RequestMapping(value = "/addPartner", method = RequestMethod.POST)
+    @PostMapping(value = "/addPartner")
     @ApiResponse(description = "Creates a new partner")
-    public ResponseEntity<?> addPartner(@RequestBody Partner partner,
+    public ResponseEntity<StringSuccessJSON> addPartner(@RequestBody Partner partner,
                                      HttpServletRequest request) {
         String response = partnerService.addPartner(partner, request);
         if (response.equals(partner.getId())) {
@@ -44,15 +46,15 @@ public class PartnerController {
      * @param partnerId - used to find the partner
      * @return Object
      */
-    @RequestMapping(value = "/getPartnerById", method = RequestMethod.GET)
+    @GetMapping(value = "/getPartnerById")
     @ApiResponse(description = "Returns a single partner")
     public ResponseEntity<?> getPartnerById(@RequestParam(value = "partnerId") String partnerId) {
         return new ResponseEntity<>(partnerService.getPartnerById(partnerId), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/getPartners", method = RequestMethod.POST)
+    @PostMapping(value = "/getPartners")
     @ApiResponse(description = "Returns partners from a list of ids")
-    public ResponseEntity<?> getPartners(@RequestBody ArrayList<String> ids) {
+    public ResponseEntity<?> getPartners(@RequestBody List<String> ids) {
         return new ResponseEntity<>(partnerService.getPartners(ids), HttpStatus.OK);
     }
 
@@ -64,9 +66,9 @@ public class PartnerController {
      * @param partnerId - used to find the partner to update
      * @return StringSuccessJSON
      */
-    @RequestMapping(value = "/updatePartner", method = RequestMethod.PUT)
+    @PutMapping(value = "/updatePartner")
     @ApiResponse(description = "Updates a partner")
-    public ResponseEntity<?> updatePartner(@RequestBody PartnerEditDTO partnerEditDTO,
+    public ResponseEntity<StringSuccessJSON> updatePartner(@RequestBody PartnerEditDTO partnerEditDTO,
                                            HttpServletRequest request,
                                            @RequestParam(value = "partnerId") String partnerId) {
         String response = partnerService.updatePartner(request, partnerEditDTO, partnerId);
@@ -82,9 +84,10 @@ public class PartnerController {
      * @param partnerId - used to find the partner to delete
      * @return StringSuccessJSON
      */
-    @RequestMapping(value = "/deletePartnerById", method = RequestMethod.DELETE)
+    @Secured({"ROLE_super_admin"})
+    @DeleteMapping(value = "/deletePartnerById")
     @ApiResponse(description = "Deletes permanently a partner")
-    public ResponseEntity<?> deletePartnerById(@RequestParam(value = "partnerId") String partnerId,
+    public ResponseEntity<StringSuccessJSON> deletePartnerById(@RequestParam(value = "partnerId") String partnerId,
                                                HttpServletRequest request) {
         String response = partnerService.deletePartnerById(request, partnerId);
         if (response.equalsIgnoreCase("success")) {
@@ -98,8 +101,7 @@ public class PartnerController {
      * @param file - the actual file to import
      * @return boolean
      */
-    @RequestMapping(value = "/importPartners", method = RequestMethod.POST,
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/importPartners", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> importPartners(@RequestParam(value = "file") MultipartFile file,
                                          HttpServletRequest request) {
         try {

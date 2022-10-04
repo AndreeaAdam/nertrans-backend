@@ -32,7 +32,7 @@ public class SearchController {
      * @return Page<User>
      * @Description: Filtered and paginated list of users
      */
-    @RequestMapping(value = "/listUsersFiltered", method = RequestMethod.POST)
+    @PostMapping(value = "/listUsersFiltered")
     @ApiResponse(description = "Filtered and paginated list of users")
     public ResponseEntity<?> listUsersFiltered(@RequestBody UserSearchDTO user,
                                                @RequestParam(value = "page") int page,
@@ -42,7 +42,7 @@ public class SearchController {
         return ResponseEntity.ok(userSearchService.listUsersFiltered(user, page, size, sort, dir));
     }
 
-    @RequestMapping(value = "/listPartnerFiltered", method = RequestMethod.POST)
+    @PostMapping(value = "/listPartnerFiltered")
     @ApiResponse(description = "Filtered and paginated list of partners")
     public ResponseEntity<?> listPartnerFiltered(@RequestBody PartnerSearchDTO partnerSearchDTO,
                                                  @RequestParam(value = "page") int page,
@@ -53,15 +53,15 @@ public class SearchController {
         return ResponseEntity.ok(partnerSearchService.listPartnerFiltered(partnerSearchDTO, page, size, sort, dir, request));
     }
 
-    @RequestMapping(value = "/listPaymentDocsFiltered", method = RequestMethod.POST)
+    @PostMapping(value = "/listPaymentDocsFiltered")
     @ApiResponse(description = "Filtered and paginated list of payment documents")
-    public ResponseEntity<?> listPaymentDocsFiltered(@RequestBody PaymentDocumentSearchDTO PaymentDocumentSearchDTO,
+    public ResponseEntity<?> listPaymentDocsFiltered(@RequestBody PaymentDocumentSearchDTO paymentDocumentSearchDTO,
                                                      @RequestParam(value = "page") int page,
                                                      @RequestParam(value = "size") int size,
                                                      @RequestParam(value = "sort", required = false) String sort,
                                                      @RequestParam(value = "dir", required = false) String dir,
                                                      HttpServletRequest request) {
-        return ResponseEntity.ok(paymentDocSearchService.listPaymentDocsFiltered(PaymentDocumentSearchDTO, page, size, sort, dir, request));
+        return ResponseEntity.ok(paymentDocSearchService.listPaymentDocsFiltered(paymentDocumentSearchDTO, page, size, sort, dir, request));
     }
 
 }

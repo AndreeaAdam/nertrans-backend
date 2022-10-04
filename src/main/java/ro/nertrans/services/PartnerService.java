@@ -127,7 +127,7 @@ public class PartnerService {
      * @param ids - array
      * @return List<Partner>
      */
-    public List<Partner> getPartners(ArrayList<String> ids){
+    public List<Partner> getPartners(List<String> ids){
         List<Partner> partners = new ArrayList<>();
         for (String id: ids) {
             if (partnerRepository.findById(id).isPresent()){

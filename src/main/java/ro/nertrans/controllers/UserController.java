@@ -45,7 +45,7 @@ public class UserController {
      * @return StringSuccessJSON
      */
     @Secured({"ROLE_super_admin"})
-    @RequestMapping(value = "/addUser", method = RequestMethod.POST)
+    @PostMapping(value = "/addUser")
     @ApiResponse(description = "Registers an user")
     public ResponseEntity<?> addUser(@RequestBody UserDTO user, HttpServletRequest request) {
         String response = userService.addUser(user, request);
@@ -60,7 +60,7 @@ public class UserController {
      * @param request  used to find out the current user
      * @return successJSON/stringSuccessJSON
      */
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    @PostMapping(value = "/login")
     @ApiResponse(description = "Logs in a user ")
     public ResponseEntity<?> login(@RequestBody UserLoginDTO userLogin, HttpServletRequest request) {
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userLogin.getEmail(), userLogin.getPassword());
@@ -83,7 +83,7 @@ public class UserController {
             return new ResponseEntity<>(new SuccessJSON(false), HttpStatus.BAD_REQUEST);
         }
     }
-    @RequestMapping(value = "/activateUser", method = RequestMethod.GET)
+    @GetMapping(value = "/activateUser")
     @ApiResponse(description = "Activates an user via the registrationCode")
     public ModelAndView activateUser(@RequestParam(value = "registrationCode") String registrationCode) {
         boolean success = userService.activateUser(registrationCode);
@@ -99,7 +99,7 @@ public class UserController {
      * @param userId - id used to find the user
      * @return Optional<User>
      */
-    @RequestMapping(value = "/getUserById", method = RequestMethod.GET)
+    @GetMapping(value = "/getUserById")
     @ApiResponse(description = "Returns an user by id")
     public ResponseEntity<?> getUserById(@RequestParam(value = "userId") String userId) {
         return new ResponseEntity<>(userService.getUserById(userId), HttpStatus.OK);
@@ -110,13 +110,13 @@ public class UserController {
      * @param request - used to find the current user
      * @return Optional<User>
      */
-    @RequestMapping(value = "/getCurrentUser", method = RequestMethod.GET)
+    @GetMapping(value = "/getCurrentUser")
     @ApiResponse(description = "Returns current user info")
     public ResponseEntity<?> getCurrentUser(HttpServletRequest request) {
         return new ResponseEntity<>(userService.getCurrentUser(request), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/sendRegistrationEmail", method = RequestMethod.GET)
+    @GetMapping(value = "/sendRegistrationEmail")
     @ApiResponse(description = "Sends email for activate account")
     public ResponseEntity<?> sendRegistrationEmail(@RequestParam(value = "userId") String userId) {
         boolean response = userService.sendRegistrationEmail(userId);
@@ -130,14 +130,14 @@ public class UserController {
      * @Description: Returns a list with all users
      */
     @Secured({"ROLE_super_admin"})
-    @RequestMapping(value = "/getAllUsers", method = RequestMethod.GET)
+    @GetMapping(value = "/getAllUsers")
     @ApiResponse(description = " Returns a list with all users")
     public ResponseEntity<?> getAllUser() {
         return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 
     @Secured({"ROLE_super_admin"})
-    @RequestMapping(value = "/updateUser", method = RequestMethod.PUT)
+    @PutMapping(value = "/updateUser")
     @ApiResponse(description = "Updates an user by id")
     public ResponseEntity<?> updateUser(@RequestBody UserEditDTO user,
                                         HttpServletRequest request,
@@ -156,7 +156,7 @@ public class UserController {
      * @return SuccessJSON
      */
     @Secured({"ROLE_super_admin"})
-    @RequestMapping(value = "/deleteUser", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/deleteUser")
     @ApiResponse(description = "Deletes an user (only for super admin)")
     public ResponseEntity<?> deleteUser(@RequestParam(value = "userId") String userId, HttpServletRequest request) {
         boolean response = userService.deleteUser(userId, request);
@@ -165,7 +165,7 @@ public class UserController {
         }else return new ResponseEntity<>(new SuccessJSON(false), HttpStatus.BAD_REQUEST);
     }
     @Secured({"ROLE_super_admin"})
-    @RequestMapping(value = "/changePasswordForUser", method = RequestMethod.PUT)
+    @PutMapping(value = "/changePasswordForUser")
     @ApiResponse(description = " Allows super admin to change user password")
     public ResponseEntity<?> changePasswordForUser(@RequestParam(value = "userId") String userId,
                                                    @RequestParam(value = "newPassword") String newPassword,
@@ -184,7 +184,7 @@ public class UserController {
      * @return SuccessJSON
      */
     @Secured({"ROLE_super_admin"})
-    @RequestMapping(value = "/changeUserStatus", method = RequestMethod.PUT)
+    @PutMapping(value = "/changeUserStatus")
     @ApiResponse(description = "Changes a user's status (active-boolean)")
     public ResponseEntity<?> changeSubUserStatus(@RequestParam(value = "userId") String userId,
                                                  @RequestParam(value = "active") boolean active,
