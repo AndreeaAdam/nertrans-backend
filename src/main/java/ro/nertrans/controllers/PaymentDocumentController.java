@@ -66,7 +66,7 @@ public class PaymentDocumentController {
 
     @PutMapping(value = "/changePaymentDocumentLimitDate")
     @ApiResponse(description = "Changes limit date for a payment document")
-    public ResponseEntity<?> changePaymentDocumentLimitDate(@RequestParam(value = "limitDate") LocalDate limitDate,
+    public ResponseEntity<?> changePaymentDocumentLimitDate(@RequestParam(value = "limitDate") String limitDate,
                                                          @RequestParam(value = "docId") String docId,
                                                          HttpServletRequest request) {
         String response = paymentDocumentService.changePaymentDocumentLimitDate(docId, limitDate, request);

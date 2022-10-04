@@ -207,30 +207,26 @@ public class PaymentDocumentService {
         if (userService.getCurrentUser(request).isEmpty()) {
             return "youAreNotLoggedIn";
         }
-        if (paymentDocumentRepository.findById(docId).isEmpty()) {
-            return "invalidId";
-        }
         Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findById(docId);
-        if (paymentDocument.isPresent()){
+        if (paymentDocument.isPresent()) {
             paymentDocument.get().setOperationStatus(operationStatus);
             paymentDocumentRepository.save(paymentDocument.get());
             return "success";
-        }return "invalidId";
+        }
+        return "invalidId";
     }
 
-    public String changePaymentDocumentLimitDate(String docId, LocalDate limitDate, HttpServletRequest request) {
+    public String changePaymentDocumentLimitDate(String docId, String limitDate, HttpServletRequest request) {
         if (userService.getCurrentUser(request).isEmpty()) {
             return "youAreNotLoggedIn";
         }
-        if (paymentDocumentRepository.findById(docId).isEmpty()) {
-            return "invalidId";
-        }
         Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findById(docId);
-        if (paymentDocument.isPresent()){
-            paymentDocument.get().setExpirationDate(limitDate);
+        if (paymentDocument.isPresent()) {
+            paymentDocument.get().setExpirationDate(LocalDate.parse(limitDate));
             paymentDocumentRepository.save(paymentDocument.get());
             return "success";
-        }return "invalidId";
+        }
+        return "invalidId";
     }
     /**
      * @Description: Deletes a paymentDocument
