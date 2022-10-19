@@ -64,7 +64,6 @@ public class NetopiaService {
         inv._currency = dto.getCurrency();
         inv._details = dto.getDetails();
         req._invoice = inv;
-        System.out.println("public cert" + publicCer);
         ListItem listItem = req.encrypt(String.valueOf(publicCer));
         NetopiaResponseDTO responseDTO = new NetopiaResponseDTO();
         responseDTO.setKey(listItem.key);
