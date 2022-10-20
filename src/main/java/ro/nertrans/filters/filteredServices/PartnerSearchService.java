@@ -36,10 +36,10 @@ public class PartnerSearchService {
      * @Description: Filtered and paginated list of partners
      */
     public Page<Partner> listPartnerFiltered(PartnerSearchDTO partnerSearchDTO, int page, int size, String sort, String dir, HttpServletRequest request) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable;
         if (size == -1 && !partnerRepository.findAll().isEmpty()) {
             pageable = PageRequest.of(page, partnerRepository.findAll().size());
-        }
+        }else  pageable = PageRequest.of(page, size);
         Query dynamicQuery;
         /**
          * @Improvable

@@ -141,7 +141,4 @@ public class PaymentDocumentController {
             return new ResponseEntity<>(new StringSuccessJSON(true, response), HttpStatus.OK);
         } else return new ResponseEntity<>(new StringSuccessJSON(false, response), HttpStatus.BAD_REQUEST);
     }
-
-
-
 }

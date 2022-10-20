@@ -33,10 +33,10 @@ public class PaymentDocSearchService {
     private UserService userService;
 
     public Page<PaymentDocument> listPaymentDocsFiltered(PaymentDocumentSearchDTO paymentDocumentSearchDTO, int page, int size, String sort, String dir, HttpServletRequest request) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable;
         if (size == -1 && !paymentDocumentRepository.findAll().isEmpty()) {
             pageable = PageRequest.of(page, paymentDocumentRepository.findAll().size());
-        }
+        }else  pageable = PageRequest.of(page, size);
         Query dynamicQuery;
         /**
          * @Improvable
