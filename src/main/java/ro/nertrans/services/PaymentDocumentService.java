@@ -82,6 +82,7 @@ public class PaymentDocumentService {
                 document.setName(paymentDocument.getName());
                 document.setPaymentMethod(paymentDocument.getPaymentMethod());
                 document.setCurrency(paymentDocument.getCurrency());
+                document.setGoodsValue(paymentDocument.getGoodsValue());
                 document.setValue(paymentDocument.getValue());
                 document.setFiscalBillSeries(paymentDocument.getFiscalBillSeries());
                 document.setFiscalBillNumber(paymentDocument.getFiscalBillNumber());

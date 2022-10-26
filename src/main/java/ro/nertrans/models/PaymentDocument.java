@@ -25,6 +25,9 @@ public class PaymentDocument {
     @Field("value")
     private double value;
 
+    @Field("goodsValue")
+    private double goodsValue;
+
     @Field("name")
     private String name;
 

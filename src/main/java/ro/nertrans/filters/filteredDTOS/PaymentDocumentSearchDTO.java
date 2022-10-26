@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -15,7 +16,7 @@ public class PaymentDocumentSearchDTO {
     private String paymentMethod;
     private String userId;
     private String partnerName;
-    private String status;
+    private List<String> statuses;
     private String docSeries;
     private String localReferenceNumber;
     private String startDate;
@@ -23,4 +24,6 @@ public class PaymentDocumentSearchDTO {
     private LocalDate startExpirationDate;
     private LocalDate endExpirationDate;
     private String operationStatus;
+    private Boolean currentExpirationDate;
+
 }

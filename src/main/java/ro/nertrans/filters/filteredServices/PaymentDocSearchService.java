@@ -20,6 +20,7 @@ import ro.nertrans.services.UserService;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,8 +86,8 @@ public class PaymentDocSearchService {
             Criteria lrnCriteria = Criteria.where("localReferenceNumber").regex(paymentDocumentSearchDTO.getLocalReferenceNumber(), "i");
             dynamicQuery.addCriteria(lrnCriteria);
         }
-        if (paymentDocumentSearchDTO.getStatus() != null) {
-            Criteria statusCriteria = Criteria.where("status").is(paymentDocumentSearchDTO.getStatus());
+        if (paymentDocumentSearchDTO.getStatuses() != null) {
+            Criteria statusCriteria = Criteria.where("status").in(paymentDocumentSearchDTO.getStatuses());
             dynamicQuery.addCriteria(statusCriteria);
         }
         if (paymentDocumentSearchDTO.getOperationStatus() != null) {
@@ -99,6 +100,10 @@ public class PaymentDocSearchService {
         }
         if (paymentDocumentSearchDTO.getStartDate() != null && paymentDocumentSearchDTO.getEndDate() != null) {
             Criteria dateRangeCriteria = Criteria.where("date").gte(LocalDate.parse(paymentDocumentSearchDTO.getStartDate()).atStartOfDay()).lte(LocalDate.parse(paymentDocumentSearchDTO.getEndDate()).atTime(23,59));
+            dynamicQuery.addCriteria(dateRangeCriteria);
+        }
+        if (paymentDocumentSearchDTO.getCurrentExpirationDate() != null) {
+            Criteria dateRangeCriteria = Criteria.where("expirationDate").lte(LocalDate.now());
             dynamicQuery.addCriteria(dateRangeCriteria);
         }
 
