@@ -2,11 +2,13 @@ package ro.nertrans.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ro.nertrans.config.UserRoleEnum;
 import ro.nertrans.dtos.OfficeDTO;
 import ro.nertrans.dtos.OperationStatusDTO;
 import ro.nertrans.models.Partner;
 import ro.nertrans.models.PaymentDocument;
 import ro.nertrans.models.Setting;
+import ro.nertrans.models.User;
 import ro.nertrans.repositories.PartnerRepository;
 import ro.nertrans.repositories.PaymentDocumentRepository;
 import ro.nertrans.repositories.SettingRepository;
@@ -17,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PaymentDocumentService {
@@ -250,12 +253,26 @@ public class PaymentDocumentService {
      * @param statuses - status's list
      * @return List<OperationStatusDTO>
      */
-    public List<OperationStatusDTO> getDocumentNumberByStatuses(List<String> statuses){
-       List<OperationStatusDTO> statusDTOS = new ArrayList<>();
-       for (String status: statuses){
-           OperationStatusDTO dto = new OperationStatusDTO(status, paymentDocumentRepository.findByOperationStatusIgnoreCase(status).size());
-           statusDTOS.add(dto);
-       }
-       return statusDTOS;
+    public List<OperationStatusDTO> getDocumentNumberByStatuses(List<String> statuses, boolean currentExpirationDate, HttpServletRequest request) {
+        Optional<User> user = userService.getCurrentUser(request);
+        List<OperationStatusDTO> statusDTOS = new ArrayList<>();
+        for (String status : statuses) {
+            OperationStatusDTO dto;
+            if (!currentExpirationDate) {
+                if (user.get().getRoles().contains(UserRoleEnum.ROLE_super_admin) || user.get().isActLikeAdmin()) {
+                    dto = new OperationStatusDTO(status, paymentDocumentRepository.findByOperationStatusIgnoreCase(status).size());
+                } else
+                    dto = new OperationStatusDTO(status, paymentDocumentRepository.findByOperationStatusIgnoreCase(status).stream().filter(paymentDocument -> user.get().getOffice().contains(paymentDocument.getDocSeries())).count());
+            } else {
+                if (user.get().getRoles().contains(UserRoleEnum.ROLE_super_admin) || user.get().isActLikeAdmin()) {
+                    dto = new OperationStatusDTO(status, (int) paymentDocumentRepository.findByOperationStatusIgnoreCase(status).stream().filter(
+                            paymentDocument -> paymentDocument.getExpirationDate() != null && (paymentDocument.getExpirationDate().isBefore(LocalDate.now()) || paymentDocument.getExpirationDate().equals(LocalDate.now()))).count());
+                } else
+                    dto = new OperationStatusDTO(status, (int) paymentDocumentRepository.findByOperationStatusIgnoreCase(status).stream().filter(
+                            paymentDocument -> paymentDocument.getExpirationDate() != null && (paymentDocument.getExpirationDate().isBefore(LocalDate.now()) || paymentDocument.getExpirationDate().equals(LocalDate.now())) && user.get().getOffice().contains(paymentDocument.getDocSeries())).count());
+            }
+            statusDTOS.add(dto);
+        }
+        return statusDTOS;
     }
 }

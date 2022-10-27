@@ -16,14 +16,14 @@ public class PaymentDocumentSearchDTO {
     private String paymentMethod;
     private String userId;
     private String partnerName;
-    private List<String> statuses;
+    private String status;
     private String docSeries;
     private String localReferenceNumber;
     private String startDate;
     private String endDate;
     private LocalDate startExpirationDate;
     private LocalDate endExpirationDate;
-    private String operationStatus;
+    private List<String> operationStatuses;
     private Boolean currentExpirationDate;
 
 }

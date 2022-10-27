@@ -125,11 +125,12 @@ public class PaymentDocumentController {
     @PostMapping(value = "/getDocumentNumberByStatuses")
     @ApiResponse(description = "Returns the maximum number for a payment document by office")
     public ResponseEntity<?> getDocumentNumberByStatuses(@RequestBody List<String> statuses,
-                                                         HttpServletRequest request) {
+                                                         HttpServletRequest request,
+                                                         @RequestParam("currentExpirationDate") boolean currentExpirationDate) {
         if (userService.getCurrentUser(request).isEmpty()){
             return new ResponseEntity<>(new StringSuccessJSON(false, "notLoggedIn"), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(paymentDocumentService.getDocumentNumberByStatuses(statuses), HttpStatus.OK);
+        return new ResponseEntity<>(paymentDocumentService.getDocumentNumberByStatuses(statuses,currentExpirationDate, request), HttpStatus.OK);
     }
     @Secured({"ROLE_super_admin"})
     @DeleteMapping(value = "/deletePaymentDocument")

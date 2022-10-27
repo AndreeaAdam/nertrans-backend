@@ -86,12 +86,12 @@ public class PaymentDocSearchService {
             Criteria lrnCriteria = Criteria.where("localReferenceNumber").regex(paymentDocumentSearchDTO.getLocalReferenceNumber(), "i");
             dynamicQuery.addCriteria(lrnCriteria);
         }
-        if (paymentDocumentSearchDTO.getStatuses() != null) {
-            Criteria statusCriteria = Criteria.where("status").in(paymentDocumentSearchDTO.getStatuses());
+        if (paymentDocumentSearchDTO.getStatus() != null) {
+            Criteria statusCriteria = Criteria.where("status").is(paymentDocumentSearchDTO.getStatus());
             dynamicQuery.addCriteria(statusCriteria);
         }
-        if (paymentDocumentSearchDTO.getOperationStatus() != null) {
-            Criteria operationalStatusCriteria = Criteria.where("operationStatus").is(paymentDocumentSearchDTO.getOperationStatus());
+        if (paymentDocumentSearchDTO.getOperationStatuses() != null) {
+            Criteria operationalStatusCriteria = Criteria.where("operationStatus").in(paymentDocumentSearchDTO.getOperationStatuses());
             dynamicQuery.addCriteria(operationalStatusCriteria);
         }
         if (paymentDocumentSearchDTO.getStartExpirationDate() != null && paymentDocumentSearchDTO.getEndExpirationDate() != null) {
@@ -102,7 +102,7 @@ public class PaymentDocSearchService {
             Criteria dateRangeCriteria = Criteria.where("date").gte(LocalDate.parse(paymentDocumentSearchDTO.getStartDate()).atStartOfDay()).lte(LocalDate.parse(paymentDocumentSearchDTO.getEndDate()).atTime(23,59));
             dynamicQuery.addCriteria(dateRangeCriteria);
         }
-        if (paymentDocumentSearchDTO.getCurrentExpirationDate() != null) {
+        if (paymentDocumentSearchDTO.getCurrentExpirationDate() != null && paymentDocumentSearchDTO.getCurrentExpirationDate()) {
             Criteria dateRangeCriteria = Criteria.where("expirationDate").lte(LocalDate.now());
             dynamicQuery.addCriteria(dateRangeCriteria);
         }
