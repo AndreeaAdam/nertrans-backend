@@ -84,7 +84,6 @@ public class PartnerController {
      * @param partnerId - used to find the partner to delete
      * @return StringSuccessJSON
      */
-    @Secured({"ROLE_super_admin"})
     @DeleteMapping(value = "/deletePartnerById")
     @ApiResponse(description = "Deletes permanently a partner")
     public ResponseEntity<StringSuccessJSON> deletePartnerById(@RequestParam(value = "partnerId") String partnerId,
