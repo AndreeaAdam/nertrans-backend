@@ -9,12 +9,16 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ro.nertrans.JSON.StringSuccessJSON;
+import ro.nertrans.dtos.DocExportDTO;
+import ro.nertrans.dtos.FileDTO;
 import ro.nertrans.models.PaymentDocument;
 import ro.nertrans.services.FileService;
 import ro.nertrans.services.PaymentDocumentService;
 import ro.nertrans.services.UserService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 @CrossOrigin
@@ -141,5 +145,24 @@ public class PaymentDocumentController {
         if (response.equalsIgnoreCase("success")) {
             return new ResponseEntity<>(new StringSuccessJSON(true, response), HttpStatus.OK);
         } else return new ResponseEntity<>(new StringSuccessJSON(false, response), HttpStatus.BAD_REQUEST);
+    }
+
+    @PostMapping(value = "/exportDocumentReport")
+    public List<DocExportDTO> exportDocumentReport(@RequestParam(value = "startDate") String startDate,
+                                                   @RequestParam(value = "endDate") String endDate,
+                                                   HttpServletRequest request) {
+       return paymentDocumentService.exportDocumentReport(startDate, endDate, request);
+    }
+
+    @PostMapping(value = "/exportDocumentReportXLS")
+    public void exportDocumentReportXLS(HttpServletResponse response,
+                                        @RequestParam("startDate") String startDate,
+                                        @RequestParam("endDate") String endDate,
+                                        HttpServletRequest request) {
+        try {
+            paymentDocumentService.exportDocumentReportXLS(response, request, startDate, endDate);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

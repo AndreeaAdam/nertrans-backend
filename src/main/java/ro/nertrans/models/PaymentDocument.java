@@ -83,7 +83,7 @@ public class PaymentDocument {
     private String licenseNumber;
 
     @Field("warranty")
-    private String warranty;
+    private double warranty;
 
     @Field("proformaSeries")
     private String proformaSeries;
