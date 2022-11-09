@@ -15,7 +15,6 @@ import ro.nertrans.services.PartnerService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @CrossOrigin

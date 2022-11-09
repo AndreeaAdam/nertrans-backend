@@ -13,6 +13,7 @@ import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import ro.nertrans.filters.filteredDTOS.PartnerSearchDTO;
 import ro.nertrans.models.Partner;
+import ro.nertrans.models.PaymentDocument;
 import ro.nertrans.repositories.PartnerRepository;
 
 import javax.inject.Inject;
@@ -80,9 +81,6 @@ public class PartnerSearchService {
         dynamicQuery.collation(Collation.of("en").
                 strength(Collation.ComparisonLevel.secondary()));
         List<Partner> list = mongoTemplate.find(dynamicQuery, Partner.class);
-        return PageableExecutionUtils.getPage(
-                list,
-                pageable,
-                () -> mongoTemplate.count(Query.of(dynamicQuery).limit(-1).skip(-1), Partner.class));
+        return org.springframework.data.support.PageableExecutionUtils.getPage(list, pageable, () -> mongoTemplate.count(Query.of(dynamicQuery).limit(-1).skip(-1), Partner.class));
     }
 }

@@ -146,7 +146,7 @@ public class PaymentDocumentController {
             return new ResponseEntity<>(new StringSuccessJSON(true, response), HttpStatus.OK);
         } else return new ResponseEntity<>(new StringSuccessJSON(false, response), HttpStatus.BAD_REQUEST);
     }
-
+    @Secured({"ROLE_super_admin", "ROLE_admin"})
     @PostMapping(value = "/exportDocumentReport")
     public List<DocExportDTO> exportDocumentReport(@RequestParam(value = "startDate") String startDate,
                                                    @RequestParam(value = "endDate") String endDate,
@@ -154,6 +154,7 @@ public class PaymentDocumentController {
        return paymentDocumentService.exportDocumentReport(startDate, endDate, request);
     }
 
+    @Secured({"ROLE_super_admin", "ROLE_admin"})
     @PostMapping(value = "/exportDocumentReportXLS")
     public void exportDocumentReportXLS(HttpServletResponse response,
                                         @RequestParam("startDate") String startDate,

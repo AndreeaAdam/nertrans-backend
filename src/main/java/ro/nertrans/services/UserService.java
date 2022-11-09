@@ -72,7 +72,7 @@ public class UserService implements UserDetailsService {
      * @param request - used to find the current user
      * @return String
      */
-    public String addUser( UserDTO user, HttpServletRequest request){
+    public String addUser(UserDTO user, HttpServletRequest request){
         if (getCurrentUser(request).isEmpty()){
             return "youAreNotLoggedIn";
         }
@@ -97,9 +97,10 @@ public class UserService implements UserDetailsService {
         user1.setOffice(user.getOffice());
         user1.setRegistrationDate(LocalDateTime.now());
         user1.setName(user.getFirstName() + " " + user.getLastName());
-        ArrayList<UserRoleEnum> userAuthorities = new ArrayList<>();
-        userAuthorities.add(UserRoleEnum.ROLE_employee);
-        user1.setRoles(userAuthorities);
+        user1.setRoles(user.getRoles());
+        if (user.getRoles().contains(UserRoleEnum.ROLE_super_admin)){
+            return "invalidRole";
+        }
         if (user.getPassword().length() < 5){
             return "passwordTooShort";
         }
@@ -218,6 +219,7 @@ public class UserService implements UserDetailsService {
         targetUser.get().setLastName(user.getLastName());
         targetUser.get().setFirstName(user.getFirstName());
         targetUser.get().setActLikeAdmin(user.isActLikeAdmin());
+        targetUser.get().setRoles(user.getRoles());
         targetUser.get().setName(user.getFirstName() + " " + user.getLastName());
         userRepository.save(targetUser.get());
         return "success";

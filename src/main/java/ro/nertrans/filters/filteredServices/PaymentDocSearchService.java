@@ -20,7 +20,6 @@ import ro.nertrans.services.UserService;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,7 +52,7 @@ public class PaymentDocSearchService {
         }
         Optional<User> user = userService.getCurrentUser(request);
         Criteria docSeriesCriteria;
-        if (user.get().getRoles().contains(UserRoleEnum.ROLE_super_admin) || user.get().isActLikeAdmin()) {
+        if (user.isPresent() && (user.get().getRoles().contains(UserRoleEnum.ROLE_super_admin) || user.get().getRoles().contains(UserRoleEnum.ROLE_admin))) {
             if (paymentDocumentSearchDTO.getDocSeries() != null) {
                 docSeriesCriteria = Criteria.where("docSeries").is(paymentDocumentSearchDTO.getDocSeries());
                 dynamicQuery.addCriteria(docSeriesCriteria);

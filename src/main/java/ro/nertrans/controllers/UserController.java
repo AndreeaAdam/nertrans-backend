@@ -49,7 +49,8 @@ public class UserController {
     @ApiResponse(description = "Registers an user")
     public ResponseEntity<?> addUser(@RequestBody UserDTO user, HttpServletRequest request) {
         String response = userService.addUser(user, request);
-        if (response.equals("emailExists") || response.equals("youAreNotLoggedIn") || response.equals("notAllowed") || response.equals("passwordTooShort")) {
+        if (response.equals("emailExists") || response.equals("youAreNotLoggedIn") || response.equals("notAllowed") || response.equals("passwordTooShort")
+                || response.equals("invalidRole")) {
             return new ResponseEntity<>(new StringSuccessJSON(false, response), HttpStatus.BAD_REQUEST);
         } else
             return new ResponseEntity<>(new StringSuccessJSON(true, response), HttpStatus.CREATED);

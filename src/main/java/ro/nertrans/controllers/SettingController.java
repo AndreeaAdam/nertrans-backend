@@ -50,7 +50,7 @@ public class SettingController {
             return new ResponseEntity<>(new StringSuccessJSON(true, response), HttpStatus.OK);
         } else return new ResponseEntity<>(new StringSuccessJSON(false, response), HttpStatus.BAD_REQUEST);
     }
-
+    @Secured({"ROLE_super_admin"})
     @PostMapping(value = "/uploadMobilPayKey", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadMobilPayKey(@RequestParam("file") MultipartFile file,
                                                HttpServletRequest request,

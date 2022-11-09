@@ -17,6 +17,7 @@ public class UserEditDTO {
     private String address;
     private String employeeCode;
     private ArrayList<String> office;
+    private ArrayList<UserRoleEnum> roles;
     private boolean actLikeAdmin;
 
 }

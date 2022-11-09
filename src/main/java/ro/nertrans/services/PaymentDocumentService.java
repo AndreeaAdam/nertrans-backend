@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ro.nertrans.config.UserRoleEnum;
 import ro.nertrans.dtos.DocExportDTO;
-import ro.nertrans.dtos.FileDTO;
 import ro.nertrans.dtos.OfficeDTO;
 import ro.nertrans.dtos.OperationStatusDTO;
 import ro.nertrans.models.Partner;
@@ -118,6 +117,7 @@ public class PaymentDocumentService {
                 document.setProformaNumber(paymentDocument.getProformaNumber());
                 document.setProformaSeries(paymentDocument.getProformaSeries());
                 document.setExpirationDate(paymentDocument.getExpirationDate());
+                document.setBillableProductName(paymentDocument.getBillableProductName());
                 if (paymentDocument.getPartnerId() != null && partnerRepository.findById(paymentDocument.getPartnerId()).isPresent()){
                     paymentDocument1.get().setPartnerName(partnerRepository.findById(paymentDocument.getPartnerId()).get().getName());
                 }
@@ -279,12 +279,12 @@ public class PaymentDocumentService {
         for (String status : statuses) {
             OperationStatusDTO dto;
             if (!currentExpirationDate) {
-                if (user.get().getRoles().contains(UserRoleEnum.ROLE_super_admin) || user.get().isActLikeAdmin()) {
+                if (user.get().getRoles().contains(UserRoleEnum.ROLE_super_admin) || user.get().getRoles().contains(UserRoleEnum.ROLE_admin)) {
                     dto = new OperationStatusDTO(status, paymentDocumentRepository.findByOperationStatusIgnoreCase(status).size());
                 } else
                     dto = new OperationStatusDTO(status, paymentDocumentRepository.findByOperationStatusIgnoreCase(status).stream().filter(paymentDocument -> user.get().getOffice().contains(paymentDocument.getDocSeries())).count());
             } else {
-                if (user.get().getRoles().contains(UserRoleEnum.ROLE_super_admin) || user.get().isActLikeAdmin()) {
+                if (user.get().getRoles().contains(UserRoleEnum.ROLE_super_admin) || user.get().getRoles().contains(UserRoleEnum.ROLE_admin)) {
                     dto = new OperationStatusDTO(status, (int) paymentDocumentRepository.findByOperationStatusIgnoreCase(status).stream().filter(
                             paymentDocument -> paymentDocument.getExpirationDate() != null && (paymentDocument.getExpirationDate().isBefore(LocalDate.now()) || paymentDocument.getExpirationDate().equals(LocalDate.now()))).count());
                 } else
