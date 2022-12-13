@@ -317,14 +317,6 @@ public class PaymentDocumentService {
             dto.setDate(date.substring(0, 1).toUpperCase() + date.substring(1));
             dto.setDocNumbers(paymentDocuments.size());
             dto.setTotalEuro(paymentDocuments.stream().mapToDouble(PaymentDocument::getGoodsValue).sum());
-//            double warranty = 0;
-//            for (PaymentDocument paymentDocument: paymentDocuments) {
-//                try {
-//                    warranty += Double.parseDouble(paymentDocument.getWarranty());
-//                }catch (Exception e){
-//                    warranty += 0;
-//                }
-//            }
             dto.setRelatedWarranty(paymentDocuments.stream().mapToDouble(PaymentDocument::getWarranty).sum());
             docs.add(dto);
         }
@@ -371,7 +363,7 @@ public class PaymentDocumentService {
                 row.getCell(i).setCellStyle(borderStyle(workbook));
                 if (i == 3 || i == 5 || i == 6){
                     DataFormat format = workbook.createDataFormat();
-                    row.getCell(i).getCellStyle().setDataFormat(format.getFormat("###,##0"));
+                    row.getCell(i).getCellStyle().setDataFormat(format.getFormat("###.##0"));
                 }
             }
         }
@@ -388,7 +380,7 @@ public class PaymentDocumentService {
         for (int i = 1; i <= 6; i++) {
             if (i != 4){
                 DataFormat format = workbook.createDataFormat();
-                sheet.getRow(rowCount).getCell(i).getCellStyle().setDataFormat(format.getFormat("###,##0"));
+                sheet.getRow(rowCount).getCell(i).getCellStyle().setDataFormat(format.getFormat("###.##0"));
             }
         }
         rowCount++;
