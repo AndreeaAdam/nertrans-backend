@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ro.nertrans.JSON.StringSuccessJSON;
 import ro.nertrans.dtos.DocExportDTO;
-import ro.nertrans.dtos.FileDTO;
-import ro.nertrans.dtos.TotalExportDTO;
+import ro.nertrans.dtos.TotalExportDatesDTO;
+import ro.nertrans.dtos.TotalReportPdfDTO;
 import ro.nertrans.models.PaymentDocument;
 import ro.nertrans.services.FileService;
 import ro.nertrans.services.PaymentDocumentService;
@@ -172,11 +172,19 @@ public class PaymentDocumentController {
     @PostMapping(value = "/exportTotalReportXLS")
     public void exportTotalReportXLS(HttpServletResponse response,
                                         HttpServletRequest request,
-                                        @RequestBody TotalExportDTO totalExportDTO) {
+                                        @RequestBody TotalExportDatesDTO totalExportDatesDTO) {
         try {
-            paymentDocumentService.exportTotalReportXLS(response, request, totalExportDTO);
+            paymentDocumentService.exportTotalReportXLS(response, request, totalExportDatesDTO);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Secured({"ROLE_super_admin", "ROLE_admin"})
+    @PostMapping(value = "/exportTotalReport")
+    @ApiResponse(description = "Returns a list with total value of factured documents between a range of dates used for PDF")
+    public ResponseEntity<?> getTotalReportPdf(HttpServletRequest request,
+                                                               @RequestBody TotalExportDatesDTO totalExportDatesDTO) {
+        return new ResponseEntity<>(paymentDocumentService.exportTotalReportPDF(request,totalExportDatesDTO), HttpStatus.OK);
     }
 }

@@ -8,10 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ro.nertrans.config.UserRoleEnum;
-import ro.nertrans.dtos.DocExportDTO;
-import ro.nertrans.dtos.OfficeDTO;
-import ro.nertrans.dtos.OperationStatusDTO;
-import ro.nertrans.dtos.TotalExportDTO;
+import ro.nertrans.dtos.*;
 import ro.nertrans.models.*;
 import ro.nertrans.repositories.PartnerRepository;
 import ro.nertrans.repositories.PaymentDocumentRepository;
@@ -325,9 +322,9 @@ public class PaymentDocumentService {
         return docs;
     }
 
-    public void exportTotalReportXLS(HttpServletResponse response, HttpServletRequest request, TotalExportDTO totalExportDTO) throws IOException {
+    public void exportTotalReportXLS(HttpServletResponse response, HttpServletRequest request, TotalExportDatesDTO totalExportDatesDTO) throws IOException {
         Optional<Setting> settings = settingService.getSettings();
-        List<PaymentDocument> paymentDocuments = paymentDocumentRepository.findAllByDateBetween(totalExportDTO.getStartDate(),totalExportDTO.getEndDate());
+        List<PaymentDocument> paymentDocuments = paymentDocumentRepository.findAllByDateBetween(totalExportDatesDTO.getStartDate(), totalExportDatesDTO.getEndDate());
         List<OfficeDTO> offices = new ArrayList<>();
         if (settings.isPresent()) {
             offices = new ArrayList<>(settings.get().getUserOffices());
@@ -402,11 +399,11 @@ public class PaymentDocumentService {
         sheet.createRow(rowNumber);
         sheet.getRow(rowNumber).createCell(1).setCellValue("Data inceput:");
         sheet.getRow(rowNumber).getCell(1).setCellStyle(boldCellStyle);
-        sheet.getRow(rowNumber++).createCell(2).setCellValue(totalExportDTO.getStartDate().toString());
+        sheet.getRow(rowNumber++).createCell(2).setCellValue(totalExportDatesDTO.getStartDate().toString());
         sheet.createRow(rowNumber);
         sheet.getRow(rowNumber).createCell(1).setCellValue("Data sfarsit:");
         sheet.getRow(rowNumber).getCell(1).setCellStyle(boldCellStyle);
-        sheet.getRow(rowNumber).createCell(2).setCellValue(totalExportDTO.getEndDate().toString());
+        sheet.getRow(rowNumber).createCell(2).setCellValue(totalExportDatesDTO.getEndDate().toString());
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("content-disposition", "attachment; filename=TotalFacturat - " + LocalDate.now() + ".xlsx");
@@ -441,6 +438,38 @@ public class PaymentDocumentService {
             }
         }
         return sum;
+    }
+
+    public TotalReportPdfDTO exportTotalReportPDF(HttpServletRequest request, TotalExportDatesDTO totalExportDatesDTO) {
+        Optional<Setting> settings = settingService.getSettings();
+        List<PaymentDocument> paymentDocuments = paymentDocumentRepository.findAllByDateBetween(totalExportDatesDTO.getStartDate(), totalExportDatesDTO.getEndDate());
+        List<OfficeDTO> offices = new ArrayList<>();
+        if (settings.isPresent()) {
+            offices = new ArrayList<>(settings.get().getUserOffices());
+        }
+
+        TotalReportPdfDTO dto = new TotalReportPdfDTO();
+        ArrayList<TotalReportDTO> totalReportDTOS = new ArrayList<>();
+        double totalSumRon = 0;
+        double totalSumEur = 0;
+        double totalSumUsd = 0;
+        for (OfficeDTO office : offices) {
+            TotalReportDTO totalReportDTO = new TotalReportDTO();
+            totalReportDTO.setDocSeries(office.getCode());
+            totalReportDTO.setAmountRon(sumRon(office,paymentDocuments));
+            totalReportDTO.setAmountEur(sumEur(office,paymentDocuments));
+            totalReportDTO.setAmountUsd(sumUsd(office,paymentDocuments));
+            totalReportDTOS.add(totalReportDTO);
+            totalSumRon += sumRon(office,paymentDocuments);
+            totalSumEur += sumEur(office,paymentDocuments);
+            totalSumUsd += sumUsd(office,paymentDocuments);
+        }
+
+        dto.setTotalReportDTOS(totalReportDTOS);
+        dto.setTotalRon(totalSumRon);
+        dto.setTotalEur(totalSumEur);
+        dto.setTotalUsd(totalSumUsd);
+        return dto;
     }
 
     public void exportDocumentReportXLS(HttpServletResponse response,HttpServletRequest request,String startDate, String endDate) throws IOException {
