@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ro.nertrans.JSON.StringSuccessJSON;
 import ro.nertrans.dtos.DocExportDTO;
 import ro.nertrans.dtos.FileDTO;
+import ro.nertrans.dtos.TotalExportDTO;
 import ro.nertrans.models.PaymentDocument;
 import ro.nertrans.services.FileService;
 import ro.nertrans.services.PaymentDocumentService;
@@ -162,6 +163,18 @@ public class PaymentDocumentController {
                                         HttpServletRequest request) {
         try {
             paymentDocumentService.exportDocumentReportXLS(response, request, startDate, endDate);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Secured({"ROLE_super_admin", "ROLE_admin"})
+    @PostMapping(value = "/exportTotalReportXLS")
+    public void exportTotalReportXLS(HttpServletResponse response,
+                                        HttpServletRequest request,
+                                        @RequestBody TotalExportDTO totalExportDTO) {
+        try {
+            paymentDocumentService.exportTotalReportXLS(response, request, totalExportDTO);
         } catch (IOException e) {
             e.printStackTrace();
         }
