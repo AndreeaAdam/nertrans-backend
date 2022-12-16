@@ -1,22 +1,19 @@
 package ro.nertrans.services;
 
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ro.nertrans.config.UserRoleEnum;
-import ro.nertrans.dtos.DocExportDTO;
-import ro.nertrans.dtos.OfficeDTO;
-import ro.nertrans.dtos.OperationStatusDTO;
-import ro.nertrans.models.Partner;
-import ro.nertrans.models.PaymentDocument;
-import ro.nertrans.models.Setting;
-import ro.nertrans.models.User;
+import ro.nertrans.dtos.*;
+import ro.nertrans.models.*;
 import ro.nertrans.repositories.PartnerRepository;
 import ro.nertrans.repositories.PaymentDocumentRepository;
 import ro.nertrans.repositories.SettingRepository;
+import ro.nertrans.repositories.TransactionRepository;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -51,6 +48,8 @@ public class PaymentDocumentService {
     private SettingRepository settingRepository;
     @Autowired
     private PartnerRepository partnerRepository;
+    @Autowired
+    private TransactionRepository transactionRepository;
     @Value("${server.servlet.contextPath}")
     private String contextPath;
     @Value("${apiUrl}")
@@ -322,6 +321,157 @@ public class PaymentDocumentService {
         }
         return docs;
     }
+
+    public void exportTotalReportXLS(HttpServletResponse response, TotalExportDatesDTO totalExportDatesDTO) throws IOException {
+        Optional<Setting> settings = settingService.getSettings();
+        List<PaymentDocument> paymentDocuments = paymentDocumentRepository.findAllByDateBetween(totalExportDatesDTO.getStartDate(), totalExportDatesDTO.getEndDate());
+        List<OfficeDTO> offices = new ArrayList<>();
+        if (settings.isPresent()) {
+            offices = new ArrayList<>(settings.get().getUserOffices());
+        }
+
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet("Total Facturat");
+        sheet.setColumnWidth(1,3000);
+        sheet.setColumnWidth(2,3000);
+        sheet.setColumnWidth(3,3000);
+        sheet.setColumnWidth(4,3000);
+
+        Font font = workbook.createFont();
+        font.setBold(true);
+
+        CellStyle boldCellStyle = workbook.createCellStyle();
+        boldCellStyle.setFont(font);
+
+        CellStyle boldRightCellStyle = workbook.createCellStyle();
+        boldRightCellStyle.setFont(font);
+        boldRightCellStyle.setAlignment(HorizontalAlignment.RIGHT);
+
+        CellStyle thinLineCellStyle = workbook.createCellStyle();
+        thinLineCellStyle.setBorderBottom(BorderStyle.THIN);
+
+        CellStyle totalLineBoldCellStyle = workbook.createCellStyle();
+        totalLineBoldCellStyle.setFont(font);
+        totalLineBoldCellStyle.setBorderTop(BorderStyle.MEDIUM);
+
+        sheet.createRow(1).createCell(1);
+        sheet.createRow(1).createCell(3);
+        sheet.createRow(4).createCell(1);
+        sheet.createRow(4).createCell(3);
+        addImageToCell(workbook, sheet, 1, 1, 4, 3, apiUrl + contextPath + File.separator + "logo-nertrans.png");
+
+        sheet.createRow(6);
+        sheet.getRow(6).createCell(2).setCellValue("RON");
+        sheet.getRow(6).createCell(3).setCellValue("EUR");
+        sheet.getRow(6).createCell(4).setCellValue("USD");
+        for (int i = 2; i<=4; i++) {
+            sheet.getRow(6).getCell(i).setCellStyle(boldRightCellStyle);
+        }
+
+        int rowNumber = 8;
+        for (OfficeDTO office : offices) {
+            Row row = sheet.createRow(rowNumber++);
+            row.createCell(1).setCellValue(office.getCode());
+            row.createCell(2).setCellValue(sumRon(office,paymentDocuments));
+            row.createCell(3).setCellValue(sumEur(office,paymentDocuments));
+            row.createCell(4).setCellValue(sumUsd(office,paymentDocuments));
+            for (int i = 1; i<=4; i++) {
+                row.getCell(i).setCellStyle(thinLineCellStyle);
+            }
+        }
+        CellAddress firstRonAddress = sheet.getRow(8).getCell(2).getAddress();
+        CellAddress firstEurAddress = sheet.getRow(8).getCell(3).getAddress();
+        CellAddress firstUsdAddress = sheet.getRow(8).getCell(4).getAddress();
+        CellAddress lastRonAddress = sheet.getRow(rowNumber-1).getCell(2).getAddress();
+        CellAddress lastEurAddress = sheet.getRow(rowNumber-1).getCell(3).getAddress();
+        CellAddress lastUsdAddress = sheet.getRow(rowNumber-1).getCell(4).getAddress();
+
+        sheet.createRow(rowNumber);
+        sheet.getRow(rowNumber).createCell(1).setCellValue("Total");
+        sheet.getRow(rowNumber).createCell(2).setCellFormula("SUM(" + firstRonAddress + ":" + lastRonAddress + ")");
+        sheet.getRow(rowNumber).createCell(3).setCellFormula("SUM(" + firstEurAddress + ":" + lastEurAddress + ")");
+        sheet.getRow(rowNumber).createCell(4).setCellFormula("SUM(" + firstUsdAddress + ":" + lastUsdAddress + ")");
+        for (int i = 1; i<=4; i++) {
+            sheet.getRow(rowNumber).getCell(i).setCellStyle(totalLineBoldCellStyle);
+        }
+
+        rowNumber = rowNumber + 2;
+        sheet.createRow(rowNumber);
+        sheet.getRow(rowNumber).createCell(1).setCellValue("Dată început:");
+        sheet.getRow(rowNumber).getCell(1).setCellStyle(boldCellStyle);
+        sheet.getRow(rowNumber++).createCell(2).setCellValue(totalExportDatesDTO.getStartDate().toString());
+        sheet.createRow(rowNumber);
+        sheet.getRow(rowNumber).createCell(1).setCellValue("Dată sfârșit:");
+        sheet.getRow(rowNumber).getCell(1).setCellStyle(boldCellStyle);
+        sheet.getRow(rowNumber).createCell(2).setCellValue(totalExportDatesDTO.getEndDate().toString());
+
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("content-disposition", "attachment; filename=Total Facturat - " + LocalDate.now() + ".xlsx");
+        workbook.write(response.getOutputStream());
+    }
+
+    private double sumRon(OfficeDTO office, List<PaymentDocument> paymentDocuments) {
+        double sum = 0;
+        for(PaymentDocument paymentDocument : paymentDocuments) {
+            if(Objects.equals(paymentDocument.getDocSeries(), office.getCode()) && paymentDocument.getCurrency().equalsIgnoreCase("RON")) {
+                sum += paymentDocument.getValue();
+            }
+        }
+        return sum;
+    }
+
+    private double sumEur(OfficeDTO office, List<PaymentDocument> paymentDocuments) {
+        double sum = 0;
+        for(PaymentDocument paymentDocument : paymentDocuments) {
+            if(Objects.equals(paymentDocument.getDocSeries(), office.getCode()) && paymentDocument.getCurrency().toLowerCase().contains("eur")) {
+                sum += paymentDocument.getValue();
+            }
+        }
+        return sum;
+    }
+
+    private double sumUsd(OfficeDTO office, List<PaymentDocument> paymentDocuments) {
+        double sum = 0;
+        for(PaymentDocument paymentDocument : paymentDocuments) {
+            if(Objects.equals(paymentDocument.getDocSeries(), office.getCode()) && paymentDocument.getCurrency().equalsIgnoreCase("USD")) {
+                sum += paymentDocument.getValue();
+            }
+        }
+        return sum;
+    }
+
+    public TotalReportPdfDTO exportTotalReportPDF(HttpServletRequest request, TotalExportDatesDTO totalExportDatesDTO) {
+        Optional<Setting> settings = settingService.getSettings();
+        List<PaymentDocument> paymentDocuments = paymentDocumentRepository.findAllByDateBetween(totalExportDatesDTO.getStartDate(), totalExportDatesDTO.getEndDate());
+        List<OfficeDTO> offices = new ArrayList<>();
+        if (settings.isPresent()) {
+            offices = new ArrayList<>(settings.get().getUserOffices());
+        }
+
+        TotalReportPdfDTO dto = new TotalReportPdfDTO();
+        ArrayList<TotalReportDTO> totalReportDTOS = new ArrayList<>();
+        double totalSumRon = 0;
+        double totalSumEur = 0;
+        double totalSumUsd = 0;
+        for (OfficeDTO office : offices) {
+            TotalReportDTO totalReportDTO = new TotalReportDTO();
+            totalReportDTO.setDocSeries(office.getCode());
+            totalReportDTO.setAmountRon(sumRon(office,paymentDocuments));
+            totalReportDTO.setAmountEur(sumEur(office,paymentDocuments));
+            totalReportDTO.setAmountUsd(sumUsd(office,paymentDocuments));
+            totalReportDTOS.add(totalReportDTO);
+            totalSumRon += sumRon(office,paymentDocuments);
+            totalSumEur += sumEur(office,paymentDocuments);
+            totalSumUsd += sumUsd(office,paymentDocuments);
+        }
+
+        dto.setTotalReportDTOS(totalReportDTOS);
+        dto.setTotalRon(totalSumRon);
+        dto.setTotalEur(totalSumEur);
+        dto.setTotalUsd(totalSumUsd);
+        return dto;
+    }
+
     public void exportDocumentReportXLS(HttpServletResponse response,HttpServletRequest request,String startDate, String endDate) throws IOException {
         XSSFWorkbook workbook = new XSSFWorkbook();
         // creating sheet with name "Report" in workbook
