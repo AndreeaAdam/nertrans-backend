@@ -171,10 +171,9 @@ public class PaymentDocumentController {
     @Secured({"ROLE_super_admin", "ROLE_admin"})
     @PostMapping(value = "/exportTotalReportXLS")
     public void exportTotalReportXLS(HttpServletResponse response,
-                                        HttpServletRequest request,
                                         @RequestBody TotalExportDatesDTO totalExportDatesDTO) {
         try {
-            paymentDocumentService.exportTotalReportXLS(response, request, totalExportDatesDTO);
+            paymentDocumentService.exportTotalReportXLS(response, totalExportDatesDTO);
         } catch (IOException e) {
             e.printStackTrace();
         }

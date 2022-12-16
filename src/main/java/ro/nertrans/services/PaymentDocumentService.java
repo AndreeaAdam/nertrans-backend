@@ -322,7 +322,7 @@ public class PaymentDocumentService {
         return docs;
     }
 
-    public void exportTotalReportXLS(HttpServletResponse response, HttpServletRequest request, TotalExportDatesDTO totalExportDatesDTO) throws IOException {
+    public void exportTotalReportXLS(HttpServletResponse response, TotalExportDatesDTO totalExportDatesDTO) throws IOException {
         Optional<Setting> settings = settingService.getSettings();
         List<PaymentDocument> paymentDocuments = paymentDocumentRepository.findAllByDateBetween(totalExportDatesDTO.getStartDate(), totalExportDatesDTO.getEndDate());
         List<OfficeDTO> offices = new ArrayList<>();
@@ -397,16 +397,16 @@ public class PaymentDocumentService {
 
         rowNumber = rowNumber + 2;
         sheet.createRow(rowNumber);
-        sheet.getRow(rowNumber).createCell(1).setCellValue("Data inceput:");
+        sheet.getRow(rowNumber).createCell(1).setCellValue("Dată început:");
         sheet.getRow(rowNumber).getCell(1).setCellStyle(boldCellStyle);
         sheet.getRow(rowNumber++).createCell(2).setCellValue(totalExportDatesDTO.getStartDate().toString());
         sheet.createRow(rowNumber);
-        sheet.getRow(rowNumber).createCell(1).setCellValue("Data sfarsit:");
+        sheet.getRow(rowNumber).createCell(1).setCellValue("Dată sfârșit:");
         sheet.getRow(rowNumber).getCell(1).setCellStyle(boldCellStyle);
         sheet.getRow(rowNumber).createCell(2).setCellValue(totalExportDatesDTO.getEndDate().toString());
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("content-disposition", "attachment; filename=TotalFacturat - " + LocalDate.now() + ".xlsx");
+        response.setHeader("content-disposition", "attachment; filename=Total Facturat - " + LocalDate.now() + ".xlsx");
         workbook.write(response.getOutputStream());
     }
 
@@ -423,7 +423,7 @@ public class PaymentDocumentService {
     private double sumEur(OfficeDTO office, List<PaymentDocument> paymentDocuments) {
         double sum = 0;
         for(PaymentDocument paymentDocument : paymentDocuments) {
-            if(Objects.equals(paymentDocument.getDocSeries(), office.getCode()) && (paymentDocument.getCurrency().equalsIgnoreCase("EUR") || paymentDocument.getCurrency().equalsIgnoreCase("EURO"))) {
+            if(Objects.equals(paymentDocument.getDocSeries(), office.getCode()) && paymentDocument.getCurrency().toLowerCase().contains("eur")) {
                 sum += paymentDocument.getValue();
             }
         }
