@@ -1,5 +1,6 @@
 package ro.nertrans.services;
 
+import org.apache.commons.math3.util.Precision;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -456,9 +457,9 @@ public class PaymentDocumentService {
         for (OfficeDTO office : offices) {
             TotalReportDTO totalReportDTO = new TotalReportDTO();
             totalReportDTO.setDocSeries(office.getCode());
-            totalReportDTO.setAmountRon(sumRon(office,paymentDocuments));
-            totalReportDTO.setAmountEur(sumEur(office,paymentDocuments));
-            totalReportDTO.setAmountUsd(sumUsd(office,paymentDocuments));
+            totalReportDTO.setAmountRon(Precision.round(sumRon(office,paymentDocuments),2));
+            totalReportDTO.setAmountEur(Precision.round(sumEur(office,paymentDocuments),2));
+            totalReportDTO.setAmountUsd(Precision.round(sumUsd(office,paymentDocuments),2));
             totalReportDTOS.add(totalReportDTO);
             totalSumRon += sumRon(office,paymentDocuments);
             totalSumEur += sumEur(office,paymentDocuments);
@@ -466,9 +467,9 @@ public class PaymentDocumentService {
         }
 
         dto.setTotalReportDTOS(totalReportDTOS);
-        dto.setTotalRon(totalSumRon);
-        dto.setTotalEur(totalSumEur);
-        dto.setTotalUsd(totalSumUsd);
+        dto.setTotalRon(Precision.round(totalSumRon, 2));
+        dto.setTotalEur(Precision.round(totalSumEur,2));
+        dto.setTotalUsd(Precision.round(totalSumUsd,2));
         return dto;
     }
 
