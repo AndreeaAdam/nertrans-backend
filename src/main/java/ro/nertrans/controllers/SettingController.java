@@ -8,12 +8,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ro.nertrans.JSON.StringSuccessJSON;
+import ro.nertrans.json.StringSuccessJSON;
 import ro.nertrans.models.Setting;
 import ro.nertrans.services.FileService;
 import ro.nertrans.services.SettingService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Optional;
 
 @CrossOrigin
 @RestController
@@ -30,7 +31,7 @@ public class SettingController {
      */
     @GetMapping(value = "/getSettings")
     @ApiResponse(description = " Returns the setting")
-    public ResponseEntity<?> getSettings() {
+    public ResponseEntity<Optional<Setting>> getSettings() {
         return new ResponseEntity<>(settingService.getSettings(), HttpStatus.OK);
     }
 

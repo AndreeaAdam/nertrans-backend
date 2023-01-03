@@ -1,4 +1,4 @@
-package ro.nertrans.filters.filteredServices;
+package ro.nertrans.filters.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
-import ro.nertrans.filters.filteredDTOS.UserSearchDTO;
+import ro.nertrans.filters.dtos.UserSearchDTO;
 import ro.nertrans.models.User;
 import ro.nertrans.repositories.UserRepository;
 

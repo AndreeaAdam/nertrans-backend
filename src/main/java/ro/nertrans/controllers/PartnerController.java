@@ -5,10 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ro.nertrans.JSON.StringSuccessJSON;
+import ro.nertrans.json.StringSuccessJSON;
 import ro.nertrans.dtos.PartnerEditDTO;
 import ro.nertrans.models.Partner;
 import ro.nertrans.services.PartnerService;
@@ -16,6 +15,7 @@ import ro.nertrans.services.PartnerService;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin
 @RestController
@@ -47,13 +47,13 @@ public class PartnerController {
      */
     @GetMapping(value = "/getPartnerById")
     @ApiResponse(description = "Returns a single partner")
-    public ResponseEntity<?> getPartnerById(@RequestParam(value = "partnerId") String partnerId) {
+    public ResponseEntity<Optional<Partner>> getPartnerById(@RequestParam(value = "partnerId") String partnerId) {
         return new ResponseEntity<>(partnerService.getPartnerById(partnerId), HttpStatus.OK);
     }
 
     @PostMapping(value = "/getPartners")
     @ApiResponse(description = "Returns partners from a list of ids")
-    public ResponseEntity<?> getPartners(@RequestBody List<String> ids) {
+    public ResponseEntity<List<Partner>> getPartners(@RequestBody List<String> ids) {
         return new ResponseEntity<>(partnerService.getPartners(ids), HttpStatus.OK);
     }
 

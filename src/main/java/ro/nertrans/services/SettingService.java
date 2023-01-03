@@ -64,7 +64,7 @@ public class SettingService {
      * @return Optional<Setting>
      */
     public Optional<Setting> getSettings() {
-        if (settingRepository.findAll().size() > 0) {
+        if (!settingRepository.findAll().isEmpty()) {
             return settingRepository.findById(settingRepository.findAll().get(settingRepository.findAll().size() - 1).getId());
         } else return Optional.empty();
     }

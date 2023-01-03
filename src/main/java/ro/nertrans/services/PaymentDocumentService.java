@@ -10,7 +10,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ro.nertrans.config.UserRoleEnum;
 import ro.nertrans.dtos.*;
-import ro.nertrans.models.*;
+import ro.nertrans.models.Partner;
+import ro.nertrans.models.PaymentDocument;
+import ro.nertrans.models.Setting;
+import ro.nertrans.models.User;
 import ro.nertrans.repositories.PartnerRepository;
 import ro.nertrans.repositories.PaymentDocumentRepository;
 import ro.nertrans.repositories.SettingRepository;
@@ -73,16 +76,27 @@ public class PaymentDocumentService {
         paymentDocument.setDate(LocalDateTime.now());
         paymentDocument.setUserId(userService.getCurrentUser(request).get().getId());
         paymentDocument.setDocNumber(incrementDocNumberByOffice(paymentDocument.getDocSeries()));
-        if (paymentDocumentRepository.findByDocSeriesAndDocNumber(paymentDocument.getDocSeries(), paymentDocument.getDocNumber()).isPresent()){
+        paymentDocument.setYear(paymentDocument.getDate().getYear() % 100);
+        if (paymentDocumentRepository.findByDocSeriesAndDocNumberAndYear(paymentDocument.getDocSeries(), paymentDocument.getDocNumber(), paymentDocument.getYear()).isPresent()){
             return "alreadyExists";
         }
-        if (paymentDocument.getPartnerId() != null && partnerRepository.findById(paymentDocument.getPartnerId()).isPresent()){
-            paymentDocument.setPartnerName(partnerRepository.findById(paymentDocument.getPartnerId()).get().getName());
+        if (paymentDocument.getPartnerId() != null){
+            Optional<Partner> partner = partnerRepository.findById(paymentDocument.getPartnerId());
+            partner.ifPresent(value -> paymentDocument.setPartnerName(value.getName()));
         }
         paymentDocument.setLocalReferenceNumber(paymentDocument.getDocSeries() + " " + paymentDocument.getDocNumber());
         paymentDocumentRepository.save(paymentDocument);
         fileService.createPaymentDocumentFolder(paymentDocument.getId());
         return paymentDocument.getId();
+    }
+    public int[] setDocsYear(){
+         int[] nr = {0};
+        paymentDocumentRepository.findAll().parallelStream().forEach(paymentDocument -> {
+           paymentDocument.setYear(paymentDocument.getDate().getYear() % 100);
+           paymentDocumentRepository.save(paymentDocument);
+           nr[0]++;
+        });
+        return nr;
     }
 
     /**
@@ -118,8 +132,9 @@ public class PaymentDocumentService {
                 document.setProformaSeries(paymentDocument.getProformaSeries());
                 document.setExpirationDate(paymentDocument.getExpirationDate());
                 document.setBillableProductName(paymentDocument.getBillableProductName());
-                if (paymentDocument.getPartnerId() != null && partnerRepository.findById(paymentDocument.getPartnerId()).isPresent()){
-                    paymentDocument1.get().setPartnerName(partnerRepository.findById(paymentDocument.getPartnerId()).get().getName());
+                if (paymentDocument.getPartnerId() != null){
+                    Optional<Partner> partner = partnerRepository.findById(paymentDocument.getPartnerId());
+                    partner.ifPresent(value -> paymentDocument.setPartnerName(value.getName()));
                 }
                 paymentDocumentRepository.save(paymentDocument1.get());
                 return "success";
@@ -134,11 +149,13 @@ public class PaymentDocumentService {
      */
     public void updatePaymentDocumentPartnerNameAndCUI(String partnerId) {
         Optional<Partner> partner = partnerRepository.findById(partnerId);
-        List<PaymentDocument> paymentDocuments = paymentDocumentRepository.findAllByPartnerId(partnerId);
-        for (PaymentDocument paymentDocument1 : paymentDocuments ) {
-            paymentDocument1.setPartnerName(partner.get().getName());
-            paymentDocument1.setPartnerCUI(partner.get().getCUI());
-            paymentDocumentRepository.save(paymentDocument1);
+        if (partner.isPresent()){
+            List<PaymentDocument> paymentDocuments = paymentDocumentRepository.findAllByPartnerId(partnerId);
+            for (PaymentDocument paymentDocument1 : paymentDocuments ) {
+                paymentDocument1.setPartnerName(partner.get().getName());
+                paymentDocument1.setPartnerCUI(partner.get().getCUI());
+                paymentDocumentRepository.save(paymentDocument1);
+            }
         }
     }
     /**
@@ -181,10 +198,10 @@ public class PaymentDocumentService {
         if (userService.getCurrentUser(request).isEmpty()) {
             return "youAreNotLoggedIn";
         }
-        if (paymentDocumentRepository.findById(paymentDocId).isEmpty()) {
+        Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findById(paymentDocId);
+        if (paymentDocument.isEmpty()) {
             return "invalidId";
         }
-        Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findById(paymentDocId);
         paymentDocument.get().setFiscalBillSeries(link);
         paymentDocumentRepository.save(paymentDocument.get());
         return "success";
@@ -212,10 +229,10 @@ public class PaymentDocumentService {
         if (userService.getCurrentUser(request).isEmpty()) {
             return "youAreNotLoggedIn";
         }
-        if (paymentDocumentRepository.findById(docId).isEmpty()) {
+        Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findById(docId);
+        if (paymentDocument.isEmpty()) {
             return "invalidId";
         }
-        Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findById(docId);
         paymentDocument.get().setStatus(status);
         paymentDocumentRepository.save(paymentDocument.get());
         return "success";

@@ -1,4 +1,4 @@
-package ro.nertrans.filters.filteredServices;
+package ro.nertrans.filters.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import ro.nertrans.config.UserRoleEnum;
-import ro.nertrans.filters.filteredDTOS.PaymentDocumentSearchDTO;
+import ro.nertrans.filters.dtos.PaymentDocumentSearchDTO;
 import ro.nertrans.models.PaymentDocument;
 import ro.nertrans.models.User;
 import ro.nertrans.repositories.PaymentDocumentRepository;
@@ -88,6 +88,10 @@ public class PaymentDocSearchService {
         if (paymentDocumentSearchDTO.getStatus() != null) {
             Criteria statusCriteria = Criteria.where("status").is(paymentDocumentSearchDTO.getStatus());
             dynamicQuery.addCriteria(statusCriteria);
+        }
+        if (paymentDocumentSearchDTO.getYear() != null) {
+            Criteria yearCriteria = Criteria.where("year").is(paymentDocumentSearchDTO.getYear());
+            dynamicQuery.addCriteria(yearCriteria);
         }
         if (paymentDocumentSearchDTO.getOperationStatuses() != null) {
             Criteria operationalStatusCriteria = Criteria.where("operationStatus").in(paymentDocumentSearchDTO.getOperationStatuses());

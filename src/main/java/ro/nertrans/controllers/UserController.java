@@ -13,8 +13,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import ro.nertrans.JSON.StringSuccessJSON;
-import ro.nertrans.JSON.SuccessJSON;
+import ro.nertrans.json.StringSuccessJSON;
+import ro.nertrans.json.SuccessJSON;
 import ro.nertrans.config.CustomAuthenticationProvider;
 import ro.nertrans.dtos.UserDTO;
 import ro.nertrans.dtos.UserEditDTO;
@@ -25,6 +25,8 @@ import ro.nertrans.services.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin
@@ -47,7 +49,7 @@ public class UserController {
     @Secured({"ROLE_super_admin"})
     @PostMapping(value = "/addUser")
     @ApiResponse(description = "Registers an user")
-    public ResponseEntity<?> addUser(@RequestBody UserDTO user, HttpServletRequest request) {
+    public ResponseEntity<StringSuccessJSON> addUser(@RequestBody UserDTO user, HttpServletRequest request) {
         String response = userService.addUser(user, request);
         if (response.equals("emailExists") || response.equals("youAreNotLoggedIn") || response.equals("notAllowed") || response.equals("passwordTooShort")
                 || response.equals("invalidRole")) {
@@ -102,7 +104,7 @@ public class UserController {
      */
     @GetMapping(value = "/getUserById")
     @ApiResponse(description = "Returns an user by id")
-    public ResponseEntity<?> getUserById(@RequestParam(value = "userId") String userId) {
+    public ResponseEntity<Optional<User>> getUserById(@RequestParam(value = "userId") String userId) {
         return new ResponseEntity<>(userService.getUserById(userId), HttpStatus.OK);
     }
 
@@ -113,13 +115,13 @@ public class UserController {
      */
     @GetMapping(value = "/getCurrentUser")
     @ApiResponse(description = "Returns current user info")
-    public ResponseEntity<?> getCurrentUser(HttpServletRequest request) {
+    public ResponseEntity<Optional<User>> getCurrentUser(HttpServletRequest request) {
         return new ResponseEntity<>(userService.getCurrentUser(request), HttpStatus.OK);
     }
 
     @GetMapping(value = "/sendRegistrationEmail")
     @ApiResponse(description = "Sends email for activate account")
-    public ResponseEntity<?> sendRegistrationEmail(@RequestParam(value = "userId") String userId) {
+    public ResponseEntity<SuccessJSON> sendRegistrationEmail(@RequestParam(value = "userId") String userId) {
         boolean response = userService.sendRegistrationEmail(userId);
         if (response){
             return new ResponseEntity<>(new SuccessJSON(true), HttpStatus.OK);
@@ -133,14 +135,14 @@ public class UserController {
     @Secured({"ROLE_super_admin"})
     @GetMapping(value = "/getAllUsers")
     @ApiResponse(description = " Returns a list with all users")
-    public ResponseEntity<?> getAllUser() {
+    public ResponseEntity<List<User>> getAllUser() {
         return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 
     @Secured({"ROLE_super_admin"})
     @PutMapping(value = "/updateUser")
     @ApiResponse(description = "Updates an user by id")
-    public ResponseEntity<?> updateUser(@RequestBody UserEditDTO user,
+    public ResponseEntity<StringSuccessJSON> updateUser(@RequestBody UserEditDTO user,
                                         HttpServletRequest request,
                                         @RequestParam(value = "userId") String userId) {
         String response = userService.updateUser(request, user, userId);
@@ -159,7 +161,7 @@ public class UserController {
     @Secured({"ROLE_super_admin"})
     @DeleteMapping(value = "/deleteUser")
     @ApiResponse(description = "Deletes an user (only for super admin)")
-    public ResponseEntity<?> deleteUser(@RequestParam(value = "userId") String userId, HttpServletRequest request) {
+    public ResponseEntity<SuccessJSON> deleteUser(@RequestParam(value = "userId") String userId, HttpServletRequest request) {
         boolean response = userService.deleteUser(userId, request);
         if (response){
             return new ResponseEntity<>(new SuccessJSON(true), HttpStatus.OK);
@@ -168,7 +170,7 @@ public class UserController {
     @Secured({"ROLE_super_admin"})
     @PutMapping(value = "/changePasswordForUser")
     @ApiResponse(description = " Allows super admin to change user password")
-    public ResponseEntity<?> changePasswordForUser(@RequestParam(value = "userId") String userId,
+    public ResponseEntity<StringSuccessJSON> changePasswordForUser(@RequestParam(value = "userId") String userId,
                                                    @RequestParam(value = "newPassword") String newPassword,
                                                    HttpServletRequest request) {
         String response = userService.changePasswordForUser(request, userId, newPassword);
@@ -187,7 +189,7 @@ public class UserController {
     @Secured({"ROLE_super_admin"})
     @PutMapping(value = "/changeUserStatus")
     @ApiResponse(description = "Changes a user's status (active-boolean)")
-    public ResponseEntity<?> changeSubUserStatus(@RequestParam(value = "userId") String userId,
+    public ResponseEntity<SuccessJSON> changeSubUserStatus(@RequestParam(value = "userId") String userId,
                                                  @RequestParam(value = "active") boolean active,
                                                  HttpServletRequest request) {
         return new ResponseEntity<>(new SuccessJSON(userService.changeUserStatus(request, userId, active)), HttpStatus.OK);

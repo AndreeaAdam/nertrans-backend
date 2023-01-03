@@ -10,6 +10,8 @@ import java.util.Optional;
 public interface PaymentDocumentRepository extends MongoRepository<PaymentDocument, String> {
 
     Optional<PaymentDocument> findByDocSeriesAndDocNumber(String docSeries, Long docNumber);
+    Optional<PaymentDocument> findByDocSeriesAndDocNumberAndYear(String docSeries, Long docNumber, double year);
+
 
     List<PaymentDocument> findAllByPartnerId(String partnerId);
     List<PaymentDocument> findByOperationStatusIgnoreCase(String operationStatus);

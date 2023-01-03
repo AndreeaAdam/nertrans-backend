@@ -60,7 +60,7 @@ public class PartnerService {
      * @param partnerId - used to find the partner
      * @return Object
      */
-    public Object getPartnerById(String partnerId){
+    public Optional<Partner> getPartnerById(String partnerId){
        return partnerRepository.findById(partnerId);
     }
 
@@ -130,9 +130,8 @@ public class PartnerService {
     public List<Partner> getPartners(List<String> ids){
         List<Partner> partners = new ArrayList<>();
         for (String id: ids) {
-            if (partnerRepository.findById(id).isPresent()){
-                partners.add(partnerRepository.findById(id).get());
-            }
+            Optional<Partner> partner = partnerRepository.findById(id);
+            partner.ifPresent(partners::add);
         }
         return partners;
     }
