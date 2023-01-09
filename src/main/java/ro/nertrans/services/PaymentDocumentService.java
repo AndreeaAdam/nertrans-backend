@@ -110,7 +110,6 @@ public class PaymentDocumentService {
         if (userService.getCurrentUser(request).isEmpty()) {
             return "youAreNotLoggedIn";
         }
-        if (paymentDocumentRepository.findById(paymentDocId).isPresent()) {
             Optional<PaymentDocument> paymentDocument1 = paymentDocumentRepository.findById(paymentDocId);
             if (paymentDocument1.isPresent()){
                 PaymentDocument document = paymentDocument1.get();
@@ -139,7 +138,6 @@ public class PaymentDocumentService {
                 paymentDocumentRepository.save(paymentDocument1.get());
                 return "success";
             }
-        }
        return "invalidId";
     }
 
