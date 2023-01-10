@@ -82,7 +82,10 @@ public class PaymentDocumentService {
         }
         if (paymentDocument.getPartnerId() != null){
             Optional<Partner> partner = partnerRepository.findById(paymentDocument.getPartnerId());
-            partner.ifPresent(value -> paymentDocument.setPartnerName(value.getName()));
+            if (partner.isPresent()){
+                paymentDocument.setPartnerName(partner.get().getName());
+                paymentDocument.setPartnerCUI(partner.get().getCUI());
+            }
         }
         paymentDocument.setLocalReferenceNumber(paymentDocument.getDocSeries() + " " + paymentDocument.getDocNumber());
         paymentDocumentRepository.save(paymentDocument);
@@ -133,7 +136,10 @@ public class PaymentDocumentService {
                 document.setBillableProductName(paymentDocument.getBillableProductName());
                 if (paymentDocument.getPartnerId() != null){
                     Optional<Partner> partner = partnerRepository.findById(paymentDocument.getPartnerId());
-                    partner.ifPresent(value -> paymentDocument.setPartnerName(value.getName()));
+                    if (partner.isPresent()){
+                        document.setPartnerName(partner.get().getName());
+                        document.setPartnerCUI(partner.get().getCUI());
+                    }
                 }
                 paymentDocumentRepository.save(paymentDocument1.get());
                 return "success";
