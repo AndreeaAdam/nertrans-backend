@@ -101,6 +101,33 @@ public class PaymentDocumentService {
         });
         return nr;
     }
+    public List<PaymentDocument> getDocumentsWithWrongPartnerName(){
+        List<PaymentDocument> documents = new ArrayList<>();
+        paymentDocumentRepository.findAll().parallelStream().forEach(paymentDocument -> {
+            if (paymentDocument.getPartnerId()!= null){
+                Optional<Partner> partner = partnerRepository.findById(paymentDocument.getPartnerId());
+                if (partner.isPresent() && !partner.get().getName().equalsIgnoreCase(paymentDocument.getPartnerName())){
+                    documents.add(paymentDocument);
+                }
+            }
+        });
+        return documents;
+    }
+    public int[] setDocumentsWithRightPartnerName(){
+        final int[] nr = {0};
+        paymentDocumentRepository.findAll().parallelStream().forEach(paymentDocument -> {
+            if (paymentDocument.getPartnerId()!= null){
+                Optional<Partner> partner = partnerRepository.findById(paymentDocument.getPartnerId());
+                if (partner.isPresent() && !partner.get().getName().equalsIgnoreCase(paymentDocument.getPartnerName())){
+                    paymentDocument.setPartnerName(partner.get().getName());
+                    paymentDocument.setPartnerCUI(partner.get().getCUI());
+                    paymentDocumentRepository.save(paymentDocument);
+                    nr[0]++;
+                }
+            }
+        });
+        return nr;
+    }
 
     /**
      * @Description: Updates a paymentDocument

@@ -119,6 +119,16 @@ public class PaymentDocumentController {
         return new ResponseEntity<>(paymentDocumentService.getPaymentDocumentById(docId), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/getDocumentsWithWrongPartnerName")
+    public ResponseEntity<?> getDocumentsWithWrongPartnerName() {
+        return new ResponseEntity<>(paymentDocumentService.getDocumentsWithWrongPartnerName(), HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/setDocumentsWithRightPartnerName")
+    public ResponseEntity<?> setDocumentsWithRightPartnerName() {
+        return new ResponseEntity<>(paymentDocumentService.setDocumentsWithRightPartnerName(), HttpStatus.OK);
+    }
+
     @GetMapping(value = "/getPaymentDocumentBySeriesAndNumber")
     @ApiResponse(description = "Returns a single doc by series and number")
     public ResponseEntity<?> getPaymentDocumentBySeriesAndNumber(@RequestParam(value = "docSeries") String docSeries, @RequestParam(value = "docNumber") Long docNumber) {
