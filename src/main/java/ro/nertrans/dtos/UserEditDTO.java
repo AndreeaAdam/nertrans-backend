@@ -19,5 +19,5 @@ public class UserEditDTO {
     private ArrayList<String> office;
     private ArrayList<UserRoleEnum> roles;
     private boolean actLikeAdmin;
-
+    private boolean canChange;
 }

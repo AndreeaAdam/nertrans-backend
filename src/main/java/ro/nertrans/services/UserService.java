@@ -221,6 +221,7 @@ public class UserService implements UserDetailsService {
         targetUser.get().setActLikeAdmin(user.isActLikeAdmin());
         targetUser.get().setRoles(user.getRoles());
         targetUser.get().setName(user.getFirstName() + " " + user.getLastName());
+        targetUser.get().setCanChange(user.isCanChange());
         userRepository.save(targetUser.get());
         return "success";
     }
