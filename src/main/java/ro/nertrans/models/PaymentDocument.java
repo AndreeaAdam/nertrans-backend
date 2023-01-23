@@ -28,6 +28,9 @@ public class PaymentDocument {
     @Field("goodsValue")
     private double goodsValue;
 
+    @Field("year")
+    private double year;
+
     @Field("name")
     private String name;
 

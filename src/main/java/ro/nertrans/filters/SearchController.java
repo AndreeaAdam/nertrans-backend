@@ -4,12 +4,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ro.nertrans.filters.filteredDTOS.PartnerSearchDTO;
-import ro.nertrans.filters.filteredDTOS.PaymentDocumentSearchDTO;
-import ro.nertrans.filters.filteredDTOS.UserSearchDTO;
-import ro.nertrans.filters.filteredServices.PartnerSearchService;
-import ro.nertrans.filters.filteredServices.PaymentDocSearchService;
-import ro.nertrans.filters.filteredServices.UserSearchService;
+import ro.nertrans.filters.dtos.PartnerSearchDTO;
+import ro.nertrans.filters.dtos.PaymentDocumentSearchDTO;
+import ro.nertrans.filters.dtos.UserSearchDTO;
+import ro.nertrans.filters.services.PartnerSearchService;
+import ro.nertrans.filters.services.PaymentDocSearchService;
+import ro.nertrans.filters.services.UserSearchService;
 
 import javax.servlet.http.HttpServletRequest;
 

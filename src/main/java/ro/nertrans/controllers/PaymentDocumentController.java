@@ -8,9 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ro.nertrans.JSON.StringSuccessJSON;
+import ro.nertrans.json.StringSuccessJSON;
 import ro.nertrans.dtos.DocExportDTO;
-import ro.nertrans.dtos.FileDTO;
+import ro.nertrans.dtos.TotalExportDatesDTO;
 import ro.nertrans.models.PaymentDocument;
 import ro.nertrans.services.FileService;
 import ro.nertrans.services.PaymentDocumentService;
@@ -44,7 +44,7 @@ public class PaymentDocumentController {
 
     @PutMapping(value = "/changePaymentDocumentStatus")
     @ApiResponse(description = "Changes status for a payment document")
-    public ResponseEntity<?> changePaymentDocumentStatus(@RequestParam(value = "status") String status,
+    public ResponseEntity<StringSuccessJSON> changePaymentDocumentStatus(@RequestParam(value = "status") String status,
                                                          @RequestParam(value = "docId") String docId,
                                                          HttpServletRequest request) {
         String response = paymentDocumentService.changePaymentDocumentStatus(docId, status, request);
@@ -53,10 +53,14 @@ public class PaymentDocumentController {
         } else
             return new ResponseEntity<>(new StringSuccessJSON(false, response), HttpStatus.BAD_REQUEST);
     }
+    @PutMapping(value = "/setDocsYear")
+    public int[] setDocsYear() {
+       return paymentDocumentService.setDocsYear();
+    }
 
     @PutMapping(value = "/changePaymentDocumentOperationStatus")
     @ApiResponse(description = "Changes operation status for a payment document")
-    public ResponseEntity<?> changePaymentDocumentOperationStatus(@RequestParam(value = "operationStatus") String operationStatus,
+    public ResponseEntity<StringSuccessJSON> changePaymentDocumentOperationStatus(@RequestParam(value = "operationStatus") String operationStatus,
                                                          @RequestParam(value = "docId") String docId,
                                                          HttpServletRequest request) {
         String response = paymentDocumentService.changePaymentDocumentOperationStatus(docId, operationStatus, request);
@@ -68,7 +72,7 @@ public class PaymentDocumentController {
 
     @PutMapping(value = "/changePaymentDocumentLimitDate")
     @ApiResponse(description = "Changes limit date for a payment document")
-    public ResponseEntity<?> changePaymentDocumentLimitDate(@RequestParam(value = "limitDate") String limitDate,
+    public ResponseEntity<StringSuccessJSON> changePaymentDocumentLimitDate(@RequestParam(value = "limitDate") String limitDate,
                                                          @RequestParam(value = "docId") String docId,
                                                          HttpServletRequest request) {
         String response = paymentDocumentService.changePaymentDocumentLimitDate(docId, limitDate, request);
@@ -80,7 +84,7 @@ public class PaymentDocumentController {
 
     @PutMapping(value = "/updatePaymentDocument")
     @ApiResponse(description = "Updates a payment document")
-    public ResponseEntity<?> updatePaymentDocument(@RequestBody PaymentDocument paymentDocument,
+    public ResponseEntity<StringSuccessJSON> updatePaymentDocument(@RequestBody PaymentDocument paymentDocument,
                                                    @RequestParam(value = "paymentDocId") String paymentDocId,
                                                    HttpServletRequest request) {
         String response = paymentDocumentService.updatePaymentDocument(paymentDocId, paymentDocument, request);
@@ -92,7 +96,7 @@ public class PaymentDocumentController {
 
     @PutMapping(value = "/setFiscalBillLink")
     @ApiResponse(description = "Changes fiscal bill link")
-    public ResponseEntity<?> setFiscalBillLink(@RequestParam(value = "link") String link,
+    public ResponseEntity<StringSuccessJSON> setFiscalBillLink(@RequestParam(value = "link") String link,
                                                @RequestParam(value = "docId") String docId,
                                                HttpServletRequest request) {
         String response = paymentDocumentService.setFiscalBillLink(docId, link, request);
@@ -113,6 +117,16 @@ public class PaymentDocumentController {
     @ApiResponse(description = "Returns a single doc by id")
     public ResponseEntity<?> getPaymentDocumentById(@RequestParam(value = "docId") String docId) {
         return new ResponseEntity<>(paymentDocumentService.getPaymentDocumentById(docId), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/getDocumentsWithWrongPartnerName")
+    public ResponseEntity<?> getDocumentsWithWrongPartnerName() {
+        return new ResponseEntity<>(paymentDocumentService.getDocumentsWithWrongPartnerName(), HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/setDocumentsWithRightPartnerName")
+    public ResponseEntity<?> setDocumentsWithRightPartnerName() {
+        return new ResponseEntity<>(paymentDocumentService.setDocumentsWithRightPartnerName(), HttpStatus.OK);
     }
 
     @GetMapping(value = "/getPaymentDocumentBySeriesAndNumber")
@@ -165,5 +179,24 @@ public class PaymentDocumentController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Secured({"ROLE_super_admin", "ROLE_admin"})
+    @PostMapping(value = "/exportTotalReportXLS")
+    public void exportTotalReportXLS(HttpServletResponse response,
+                                        @RequestBody TotalExportDatesDTO totalExportDatesDTO) {
+        try {
+            paymentDocumentService.exportTotalReportXLS(response, totalExportDatesDTO);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Secured({"ROLE_super_admin", "ROLE_admin"})
+    @PostMapping(value = "/exportTotalReport")
+    @ApiResponse(description = "Returns a list with total value of factured documents between a range of dates used for PDF")
+    public ResponseEntity<?> getTotalReportPdf(HttpServletRequest request,
+                                                               @RequestBody TotalExportDatesDTO totalExportDatesDTO) {
+        return new ResponseEntity<>(paymentDocumentService.exportTotalReportPDF(request,totalExportDatesDTO), HttpStatus.OK);
     }
 }

@@ -1,4 +1,4 @@
-package ro.nertrans.filters.filteredDTOS;
+package ro.nertrans.filters.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,5 +25,6 @@ public class PaymentDocumentSearchDTO {
     private LocalDate endExpirationDate;
     private List<String> operationStatuses;
     private Boolean currentExpirationDate;
+    private Double year;
 
 }

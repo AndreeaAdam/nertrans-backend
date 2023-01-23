@@ -1,15 +1,15 @@
 package ro.nertrans.services;
 
+import org.apache.commons.math3.util.Precision;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ro.nertrans.config.UserRoleEnum;
-import ro.nertrans.dtos.DocExportDTO;
-import ro.nertrans.dtos.OfficeDTO;
-import ro.nertrans.dtos.OperationStatusDTO;
+import ro.nertrans.dtos.*;
 import ro.nertrans.models.Partner;
 import ro.nertrans.models.PaymentDocument;
 import ro.nertrans.models.Setting;
@@ -17,6 +17,7 @@ import ro.nertrans.models.User;
 import ro.nertrans.repositories.PartnerRepository;
 import ro.nertrans.repositories.PaymentDocumentRepository;
 import ro.nertrans.repositories.SettingRepository;
+import ro.nertrans.repositories.TransactionRepository;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -51,6 +52,8 @@ public class PaymentDocumentService {
     private SettingRepository settingRepository;
     @Autowired
     private PartnerRepository partnerRepository;
+    @Autowired
+    private TransactionRepository transactionRepository;
     @Value("${server.servlet.contextPath}")
     private String contextPath;
     @Value("${apiUrl}")
@@ -73,16 +76,57 @@ public class PaymentDocumentService {
         paymentDocument.setDate(LocalDateTime.now());
         paymentDocument.setUserId(userService.getCurrentUser(request).get().getId());
         paymentDocument.setDocNumber(incrementDocNumberByOffice(paymentDocument.getDocSeries()));
-        if (paymentDocumentRepository.findByDocSeriesAndDocNumber(paymentDocument.getDocSeries(), paymentDocument.getDocNumber()).isPresent()){
+        paymentDocument.setYear(paymentDocument.getDate().getYear() % 100);
+        if (paymentDocumentRepository.findByDocSeriesAndDocNumberAndYear(paymentDocument.getDocSeries(), paymentDocument.getDocNumber(), paymentDocument.getYear()).isPresent()){
             return "alreadyExists";
         }
-        if (paymentDocument.getPartnerId() != null && partnerRepository.findById(paymentDocument.getPartnerId()).isPresent()){
-            paymentDocument.setPartnerName(partnerRepository.findById(paymentDocument.getPartnerId()).get().getName());
+        if (paymentDocument.getPartnerId() != null){
+            Optional<Partner> partner = partnerRepository.findById(paymentDocument.getPartnerId());
+            if (partner.isPresent()){
+                paymentDocument.setPartnerName(partner.get().getName());
+                paymentDocument.setPartnerCUI(partner.get().getCUI());
+            }
         }
         paymentDocument.setLocalReferenceNumber(paymentDocument.getDocSeries() + " " + paymentDocument.getDocNumber());
         paymentDocumentRepository.save(paymentDocument);
         fileService.createPaymentDocumentFolder(paymentDocument.getId());
         return paymentDocument.getId();
+    }
+    public int[] setDocsYear(){
+         int[] nr = {0};
+        paymentDocumentRepository.findAll().parallelStream().forEach(paymentDocument -> {
+           paymentDocument.setYear(paymentDocument.getDate().getYear() % 100);
+           paymentDocumentRepository.save(paymentDocument);
+           nr[0]++;
+        });
+        return nr;
+    }
+    public List<PaymentDocument> getDocumentsWithWrongPartnerName(){
+        List<PaymentDocument> documents = new ArrayList<>();
+        paymentDocumentRepository.findAll().parallelStream().forEach(paymentDocument -> {
+            if (paymentDocument.getPartnerId()!= null){
+                Optional<Partner> partner = partnerRepository.findById(paymentDocument.getPartnerId());
+                if (partner.isPresent() && !partner.get().getName().equalsIgnoreCase(paymentDocument.getPartnerName())){
+                    documents.add(paymentDocument);
+                }
+            }
+        });
+        return documents;
+    }
+    public int[] setDocumentsWithRightPartnerName(){
+        final int[] nr = {0};
+        paymentDocumentRepository.findAll().parallelStream().forEach(paymentDocument -> {
+            if (paymentDocument.getPartnerId()!= null){
+                Optional<Partner> partner = partnerRepository.findById(paymentDocument.getPartnerId());
+                if (partner.isPresent() && !partner.get().getName().equalsIgnoreCase(paymentDocument.getPartnerName())){
+                    paymentDocument.setPartnerName(partner.get().getName());
+                    paymentDocument.setPartnerCUI(partner.get().getCUI());
+                    paymentDocumentRepository.save(paymentDocument);
+                    nr[0]++;
+                }
+            }
+        });
+        return nr;
     }
 
     /**
@@ -96,7 +140,6 @@ public class PaymentDocumentService {
         if (userService.getCurrentUser(request).isEmpty()) {
             return "youAreNotLoggedIn";
         }
-        if (paymentDocumentRepository.findById(paymentDocId).isPresent()) {
             Optional<PaymentDocument> paymentDocument1 = paymentDocumentRepository.findById(paymentDocId);
             if (paymentDocument1.isPresent()){
                 PaymentDocument document = paymentDocument1.get();
@@ -118,13 +161,16 @@ public class PaymentDocumentService {
                 document.setProformaSeries(paymentDocument.getProformaSeries());
                 document.setExpirationDate(paymentDocument.getExpirationDate());
                 document.setBillableProductName(paymentDocument.getBillableProductName());
-                if (paymentDocument.getPartnerId() != null && partnerRepository.findById(paymentDocument.getPartnerId()).isPresent()){
-                    paymentDocument1.get().setPartnerName(partnerRepository.findById(paymentDocument.getPartnerId()).get().getName());
+                if (paymentDocument.getPartnerId() != null){
+                    Optional<Partner> partner = partnerRepository.findById(paymentDocument.getPartnerId());
+                    if (partner.isPresent()){
+                        document.setPartnerName(partner.get().getName());
+                        document.setPartnerCUI(partner.get().getCUI());
+                    }
                 }
                 paymentDocumentRepository.save(paymentDocument1.get());
                 return "success";
             }
-        }
        return "invalidId";
     }
 
@@ -134,11 +180,13 @@ public class PaymentDocumentService {
      */
     public void updatePaymentDocumentPartnerNameAndCUI(String partnerId) {
         Optional<Partner> partner = partnerRepository.findById(partnerId);
-        List<PaymentDocument> paymentDocuments = paymentDocumentRepository.findAllByPartnerId(partnerId);
-        for (PaymentDocument paymentDocument1 : paymentDocuments ) {
-            paymentDocument1.setPartnerName(partner.get().getName());
-            paymentDocument1.setPartnerCUI(partner.get().getCUI());
-            paymentDocumentRepository.save(paymentDocument1);
+        if (partner.isPresent()){
+            List<PaymentDocument> paymentDocuments = paymentDocumentRepository.findAllByPartnerId(partnerId);
+            for (PaymentDocument paymentDocument1 : paymentDocuments ) {
+                paymentDocument1.setPartnerName(partner.get().getName());
+                paymentDocument1.setPartnerCUI(partner.get().getCUI());
+                paymentDocumentRepository.save(paymentDocument1);
+            }
         }
     }
     /**
@@ -181,10 +229,10 @@ public class PaymentDocumentService {
         if (userService.getCurrentUser(request).isEmpty()) {
             return "youAreNotLoggedIn";
         }
-        if (paymentDocumentRepository.findById(paymentDocId).isEmpty()) {
+        Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findById(paymentDocId);
+        if (paymentDocument.isEmpty()) {
             return "invalidId";
         }
-        Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findById(paymentDocId);
         paymentDocument.get().setFiscalBillSeries(link);
         paymentDocumentRepository.save(paymentDocument.get());
         return "success";
@@ -212,10 +260,10 @@ public class PaymentDocumentService {
         if (userService.getCurrentUser(request).isEmpty()) {
             return "youAreNotLoggedIn";
         }
-        if (paymentDocumentRepository.findById(docId).isEmpty()) {
+        Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findById(docId);
+        if (paymentDocument.isEmpty()) {
             return "invalidId";
         }
-        Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findById(docId);
         paymentDocument.get().setStatus(status);
         paymentDocumentRepository.save(paymentDocument.get());
         return "success";
@@ -326,6 +374,157 @@ public class PaymentDocumentService {
         }
         return docs;
     }
+
+    public void exportTotalReportXLS(HttpServletResponse response, TotalExportDatesDTO totalExportDatesDTO) throws IOException {
+        Optional<Setting> settings = settingService.getSettings();
+        List<PaymentDocument> paymentDocuments = paymentDocumentRepository.findAllByDateBetween(totalExportDatesDTO.getStartDate(), totalExportDatesDTO.getEndDate());
+        List<OfficeDTO> offices = new ArrayList<>();
+        if (settings.isPresent()) {
+            offices = new ArrayList<>(settings.get().getUserOffices());
+        }
+
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet("Total Facturat");
+        sheet.setColumnWidth(1,3000);
+        sheet.setColumnWidth(2,3000);
+        sheet.setColumnWidth(3,3000);
+        sheet.setColumnWidth(4,3000);
+
+        Font font = workbook.createFont();
+        font.setBold(true);
+
+        CellStyle boldCellStyle = workbook.createCellStyle();
+        boldCellStyle.setFont(font);
+
+        CellStyle boldRightCellStyle = workbook.createCellStyle();
+        boldRightCellStyle.setFont(font);
+        boldRightCellStyle.setAlignment(HorizontalAlignment.RIGHT);
+
+        CellStyle thinLineCellStyle = workbook.createCellStyle();
+        thinLineCellStyle.setBorderBottom(BorderStyle.THIN);
+
+        CellStyle totalLineBoldCellStyle = workbook.createCellStyle();
+        totalLineBoldCellStyle.setFont(font);
+        totalLineBoldCellStyle.setBorderTop(BorderStyle.MEDIUM);
+
+        sheet.createRow(1).createCell(1);
+        sheet.createRow(1).createCell(3);
+        sheet.createRow(4).createCell(1);
+        sheet.createRow(4).createCell(3);
+        addImageToCell(workbook, sheet, 1, 1, 4, 3, apiUrl + contextPath + File.separator + "logo-nertrans.png");
+
+        sheet.createRow(6);
+        sheet.getRow(6).createCell(2).setCellValue("RON");
+        sheet.getRow(6).createCell(3).setCellValue("EUR");
+        sheet.getRow(6).createCell(4).setCellValue("USD");
+        for (int i = 2; i<=4; i++) {
+            sheet.getRow(6).getCell(i).setCellStyle(boldRightCellStyle);
+        }
+
+        int rowNumber = 8;
+        for (OfficeDTO office : offices) {
+            Row row = sheet.createRow(rowNumber++);
+            row.createCell(1).setCellValue(office.getCode());
+            row.createCell(2).setCellValue(sumRon(office,paymentDocuments));
+            row.createCell(3).setCellValue(sumEur(office,paymentDocuments));
+            row.createCell(4).setCellValue(sumUsd(office,paymentDocuments));
+            for (int i = 1; i<=4; i++) {
+                row.getCell(i).setCellStyle(thinLineCellStyle);
+            }
+        }
+        CellAddress firstRonAddress = sheet.getRow(8).getCell(2).getAddress();
+        CellAddress firstEurAddress = sheet.getRow(8).getCell(3).getAddress();
+        CellAddress firstUsdAddress = sheet.getRow(8).getCell(4).getAddress();
+        CellAddress lastRonAddress = sheet.getRow(rowNumber-1).getCell(2).getAddress();
+        CellAddress lastEurAddress = sheet.getRow(rowNumber-1).getCell(3).getAddress();
+        CellAddress lastUsdAddress = sheet.getRow(rowNumber-1).getCell(4).getAddress();
+
+        sheet.createRow(rowNumber);
+        sheet.getRow(rowNumber).createCell(1).setCellValue("Total");
+        sheet.getRow(rowNumber).createCell(2).setCellFormula("SUM(" + firstRonAddress + ":" + lastRonAddress + ")");
+        sheet.getRow(rowNumber).createCell(3).setCellFormula("SUM(" + firstEurAddress + ":" + lastEurAddress + ")");
+        sheet.getRow(rowNumber).createCell(4).setCellFormula("SUM(" + firstUsdAddress + ":" + lastUsdAddress + ")");
+        for (int i = 1; i<=4; i++) {
+            sheet.getRow(rowNumber).getCell(i).setCellStyle(totalLineBoldCellStyle);
+        }
+
+        rowNumber = rowNumber + 2;
+        sheet.createRow(rowNumber);
+        sheet.getRow(rowNumber).createCell(1).setCellValue("Dată început:");
+        sheet.getRow(rowNumber).getCell(1).setCellStyle(boldCellStyle);
+        sheet.getRow(rowNumber++).createCell(2).setCellValue(totalExportDatesDTO.getStartDate().toString());
+        sheet.createRow(rowNumber);
+        sheet.getRow(rowNumber).createCell(1).setCellValue("Dată sfârșit:");
+        sheet.getRow(rowNumber).getCell(1).setCellStyle(boldCellStyle);
+        sheet.getRow(rowNumber).createCell(2).setCellValue(totalExportDatesDTO.getEndDate().toString());
+
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("content-disposition", "attachment; filename=Total Facturat - " + LocalDate.now() + ".xlsx");
+        workbook.write(response.getOutputStream());
+    }
+
+    private double sumRon(OfficeDTO office, List<PaymentDocument> paymentDocuments) {
+        double sum = 0;
+        for(PaymentDocument paymentDocument : paymentDocuments) {
+            if(Objects.equals(paymentDocument.getDocSeries(), office.getCode()) && paymentDocument.getCurrency().equalsIgnoreCase("RON")) {
+                sum += paymentDocument.getValue();
+            }
+        }
+        return sum;
+    }
+
+    private double sumEur(OfficeDTO office, List<PaymentDocument> paymentDocuments) {
+        double sum = 0;
+        for(PaymentDocument paymentDocument : paymentDocuments) {
+            if(Objects.equals(paymentDocument.getDocSeries(), office.getCode()) && paymentDocument.getCurrency().toLowerCase().contains("eur")) {
+                sum += paymentDocument.getValue();
+            }
+        }
+        return sum;
+    }
+
+    private double sumUsd(OfficeDTO office, List<PaymentDocument> paymentDocuments) {
+        double sum = 0;
+        for(PaymentDocument paymentDocument : paymentDocuments) {
+            if(Objects.equals(paymentDocument.getDocSeries(), office.getCode()) && paymentDocument.getCurrency().equalsIgnoreCase("USD")) {
+                sum += paymentDocument.getValue();
+            }
+        }
+        return sum;
+    }
+
+    public TotalReportPdfDTO exportTotalReportPDF(HttpServletRequest request, TotalExportDatesDTO totalExportDatesDTO) {
+        Optional<Setting> settings = settingService.getSettings();
+        List<PaymentDocument> paymentDocuments = paymentDocumentRepository.findAllByDateBetween(totalExportDatesDTO.getStartDate(), totalExportDatesDTO.getEndDate());
+        List<OfficeDTO> offices = new ArrayList<>();
+        if (settings.isPresent()) {
+            offices = new ArrayList<>(settings.get().getUserOffices());
+        }
+
+        TotalReportPdfDTO dto = new TotalReportPdfDTO();
+        ArrayList<TotalReportDTO> totalReportDTOS = new ArrayList<>();
+        double totalSumRon = 0;
+        double totalSumEur = 0;
+        double totalSumUsd = 0;
+        for (OfficeDTO office : offices) {
+            TotalReportDTO totalReportDTO = new TotalReportDTO();
+            totalReportDTO.setDocSeries(office.getCode());
+            totalReportDTO.setAmountRon(Precision.round(sumRon(office,paymentDocuments),2));
+            totalReportDTO.setAmountEur(Precision.round(sumEur(office,paymentDocuments),2));
+            totalReportDTO.setAmountUsd(Precision.round(sumUsd(office,paymentDocuments),2));
+            totalReportDTOS.add(totalReportDTO);
+            totalSumRon += sumRon(office,paymentDocuments);
+            totalSumEur += sumEur(office,paymentDocuments);
+            totalSumUsd += sumUsd(office,paymentDocuments);
+        }
+
+        dto.setTotalReportDTOS(totalReportDTOS);
+        dto.setTotalRon(Precision.round(totalSumRon, 2));
+        dto.setTotalEur(Precision.round(totalSumEur,2));
+        dto.setTotalUsd(Precision.round(totalSumUsd,2));
+        return dto;
+    }
+
     public void exportDocumentReportXLS(HttpServletResponse response,HttpServletRequest request,String startDate, String endDate) throws IOException {
         XSSFWorkbook workbook = new XSSFWorkbook();
         // creating sheet with name "Report" in workbook

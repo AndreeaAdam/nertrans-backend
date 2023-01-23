@@ -30,7 +30,7 @@ public class NumberCounterService {
 
         long number;
         Optional<NumberCounter> last = numberCounterRepository.findTopByOrderByIdDesc();
-        if (numberCounterRepository.findTopByOrderByIdDesc().isPresent()) {
+        if (last.isPresent()) {
             long lastNum = last.get().getSeqUser();
             last.get().setSeqUser(lastNum + 1);
             numberCounterRepository.save(last.get());
@@ -50,7 +50,7 @@ public class NumberCounterService {
 
         long number;
         Optional<NumberCounter> last = numberCounterRepository.findTopByOrderByIdDesc();
-        if (numberCounterRepository.findTopByOrderByIdDesc().isPresent()) {
+        if (last.isPresent()) {
             long lastNum = last.get().getSeqPartner();
             last.get().setSeqPartner(lastNum + 1);
             numberCounterRepository.save(last.get());

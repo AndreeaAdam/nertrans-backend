@@ -60,7 +60,7 @@ public class PartnerService {
      * @param partnerId - used to find the partner
      * @return Object
      */
-    public Object getPartnerById(String partnerId){
+    public Optional<Partner> getPartnerById(String partnerId){
        return partnerRepository.findById(partnerId);
     }
 
@@ -96,7 +96,6 @@ public class PartnerService {
         partner1.get().setAddress(partnerEditDTO.getAddress());
         partner1.get().setTelephone(partnerEditDTO.getTelephone());
         partner1.get().setEmail(partnerEditDTO.getEmail());
-        partner1.get().setName(partnerEditDTO.getName());
         partner1.get().setCity(partnerEditDTO.getCity());
         partner1.get().setCountry(partnerEditDTO.getCountry());
         partner1.get().setCounty(partnerEditDTO.getCounty());
@@ -111,13 +110,21 @@ public class PartnerService {
             return "registrationCodeMustBeUnique";
         }
         if (!partnerEditDTO.getName().equalsIgnoreCase(partner1.get().getName())) {
-            List<PaymentDocument> documents = paymentDocumentRepository.findAll().stream().filter(paymentDocument -> paymentDocument.getPartnerId().equalsIgnoreCase(partnerId)).collect(Collectors.toList());
+            List<PaymentDocument> documents = paymentDocumentRepository.findAllByPartnerId(partnerId);
+            documents.forEach(paymentDocument -> {
+                paymentDocument.setPartnerName(partnerEditDTO.getName());
+                paymentDocumentRepository.save(paymentDocument);
+            });
+        }
+        if (!partnerEditDTO.getCUI().equalsIgnoreCase(partner1.get().getCUI())) {
+            List<PaymentDocument> documents = paymentDocumentRepository.findAllByPartnerId(partnerId);
             documents.forEach(paymentDocument -> {
                 paymentDocument.setPartnerName(partnerEditDTO.getName());
                 paymentDocumentRepository.save(paymentDocument);
             });
         }
         partner1.get().setCUI(partnerEditDTO.getCUI());
+        partner1.get().setName(partnerEditDTO.getName());
         partnerRepository.save(partner1.get());
         return "success";
     }
@@ -130,9 +137,8 @@ public class PartnerService {
     public List<Partner> getPartners(List<String> ids){
         List<Partner> partners = new ArrayList<>();
         for (String id: ids) {
-            if (partnerRepository.findById(id).isPresent()){
-                partners.add(partnerRepository.findById(id).get());
-            }
+            Optional<Partner> partner = partnerRepository.findById(id);
+            partner.ifPresent(partners::add);
         }
         return partners;
     }

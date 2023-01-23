@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import ro.nertrans.JSON.StringSuccessJSON;
+import ro.nertrans.json.StringSuccessJSON;
 import ro.nertrans.dtos.FileDTO;
 import ro.nertrans.models.PaymentDocument;
 import ro.nertrans.models.Setting;
@@ -22,8 +22,6 @@ import java.util.Optional;
 @Service
 public class FileService {
     @Autowired
-    private UserService userService;
-    @Autowired
     private PaymentDocumentRepository paymentDocumentRepository;
     @Autowired
     private SettingService settingService;
@@ -34,7 +32,6 @@ public class FileService {
     @Value("${apiUrlPort}")
     private String apiUrlPort;
 
-    ResponseEntity<?> response;
 
     public void createPaymentDocumentFolder(String docId) {
         File uploadDir = new File(uploadDirectory);
@@ -74,59 +71,6 @@ public class FileService {
             settingFolder.setExecutable(true, false);
         }
     }
-
-//    public ResponseEntity<?> uploadDocAttachments(ArrayList<MultipartFile> files, HttpServletRequest request, String docId) {
-//        if (userService.getCurrentUser(request).isEmpty()){
-//            response = new ResponseEntity<>(new StringSuccessJSON(false, "youAreNotLoggedIn"), HttpStatus.BAD_REQUEST);
-//        }
-//        if (paymentDocumentRepository.findById(docId).isEmpty()){
-//            response = new ResponseEntity<>(new StringSuccessJSON(false, "invalidId"), HttpStatus.BAD_REQUEST);
-//        }
-//
-//        try {
-//            for (MultipartFile file : files) {
-//                //File extension limitations
-//                if (!file.isEmpty()) {
-//                    byte[] bytes = file.getBytes();
-//                    Optional<User> currentUser = userService.getCurrentUser(request);
-//                    Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findById(docId);
-//                    File paymentDocumentLocation = new File(uploadDirectory + File.separator + "paymentDocuments" + File.separator + docId);
-//                    String fileName = file.getOriginalFilename();
-//                    File serverFile = new File(paymentDocumentLocation.getAbsolutePath() + File.separator + fileName);
-//                    try {
-//                        ArrayList<FileDTO> attachments = new ArrayList<>();
-//                        if (paymentDocument.get().getAttachment()!= null) {
-//                            attachments = paymentDocument.get().getAttachment();
-//                        }
-//                        // Writes the image
-//                        BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
-//                        stream.write(bytes);
-//                        serverFile.setWritable(true, true);
-//                        serverFile.setReadable(true, false);
-//                        serverFile.setExecutable(true, false);
-//                        stream.close();
-//
-//                        FileDTO dto = new FileDTO();
-//                        dto.setFileName(serverFile.getName());
-//                        dto.setFilePath(apiUrlPort + request.getContextPath() + File.separator + "files" + File.separator + "users" + File.separator + currentUser.get().getId() + File.separator + "brandIcons" + File.separator + fileName);
-//
-//                        attachments.add(dto);
-//                        paymentDocument.get().setAttachment(attachments);
-//                        paymentDocumentRepository.save(paymentDocument.get());
-//                        response = new ResponseEntity<>(new StringSuccessJSON(true, fileName), HttpStatus.OK);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                        response = new ResponseEntity<>(new StringSuccessJSON(false, "File Upload Failure.."), HttpStatus.BAD_REQUEST);
-//                    }
-//                } else {
-//                    response = new ResponseEntity<>(new StringSuccessJSON(false, "File of wrong extension type or upload problem"), HttpStatus.BAD_REQUEST);
-//                }
-//            }
-//        } catch (Exception e) {
-//            response = new ResponseEntity<>(new StringSuccessJSON(false, "File Upload Failure.."), HttpStatus.BAD_REQUEST);
-//        }
-//        return response;
-//    }
 
     public ResponseEntity<?> uploadDocAttachment(MultipartFile file, HttpServletRequest request, String docId) {
 

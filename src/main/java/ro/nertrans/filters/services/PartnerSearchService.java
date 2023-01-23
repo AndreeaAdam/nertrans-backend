@@ -1,4 +1,4 @@
-package ro.nertrans.filters.filteredServices;
+package ro.nertrans.filters.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -9,11 +9,9 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Collation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
-import ro.nertrans.filters.filteredDTOS.PartnerSearchDTO;
+import ro.nertrans.filters.dtos.PartnerSearchDTO;
 import ro.nertrans.models.Partner;
-import ro.nertrans.models.PaymentDocument;
 import ro.nertrans.repositories.PartnerRepository;
 
 import javax.inject.Inject;
