@@ -228,11 +228,15 @@ public class PaymentDocumentService {
      * @return String
      */
     public String changePaymentDocumentOperationStatus(String docId, String operationStatus, HttpServletRequest request) {
-        if (userService.getCurrentUser(request).isEmpty()) {
+        Optional<User> user = userService.getCurrentUser(request);
+        if (user.isEmpty()) {
             return "youAreNotLoggedIn";
         }
         Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findById(docId);
         if (paymentDocument.isPresent()) {
+            if ((operationStatus.equalsIgnoreCase("DGV") || paymentDocument.get().getOperationStatus().equalsIgnoreCase("DGV")) && !user.get().isDgvAccess()) {
+                return "notAllowed";
+            }
             paymentDocument.get().setOperationStatus(operationStatus);
             paymentDocumentRepository.save(paymentDocument.get());
             return "success";
