@@ -234,7 +234,7 @@ public class PaymentDocumentService {
         }
         Optional<PaymentDocument> paymentDocument = paymentDocumentRepository.findById(docId);
         if (paymentDocument.isPresent()) {
-            if ((operationStatus.equalsIgnoreCase("DGV") || paymentDocument.get().getOperationStatus().equalsIgnoreCase("DGV")) && !user.get().isAdminDgv()) {
+            if ((operationStatus.equalsIgnoreCase("DGV") || paymentDocument.get().getOperationStatus().equalsIgnoreCase("DGV")) && !user.get().isDgvAccess()) {
                 return "notAllowed";
             }
             paymentDocument.get().setOperationStatus(operationStatus);
