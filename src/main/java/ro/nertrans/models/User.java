@@ -64,6 +64,6 @@ public class User {
     @Field("name")
     private String name;
 
-    @Field("canChange")
-    private boolean canChange;
+    @Field("adminDgv")
+    private boolean adminDgv;
 }
