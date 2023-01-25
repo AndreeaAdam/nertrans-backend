@@ -64,6 +64,6 @@ public class User {
     @Field("name")
     private String name;
 
-    @Field("DgvAccess")
-    private boolean DgvAccess;
+    @Field("dgvAccess")
+    private boolean dgvAccess;
 }
